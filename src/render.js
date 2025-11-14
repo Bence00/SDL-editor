@@ -3,6 +3,8 @@ import { svg } from './dom.js';
 import { state } from './state.js';
 import { getNodeById, computePortPositions } from './model.js';
 import { capitalize } from './utils.js';
+import { createBodyShape } from './nodeShapes.js';
+
 
 export function render() {
   clearSvg();
@@ -37,14 +39,6 @@ function ensureDefs() {
   svg.appendChild(defs);
 }
 
-/**
- * Render edges as port-to-port orthogonal paths.
- * Port is chosen dynamically based on relative node position:
- *  - B right of A  -> A.right -> B.left
- *  - B left of A   -> A.left  -> B.right
- *  - B below A     -> A.bottom-> B.top
- *  - B above A     -> A.top   -> B.bottom
- */
 function renderEdges() {
   state.edges.forEach(edge => {
     const fromNode = getNodeById(edge.fromNodeId);
@@ -66,15 +60,12 @@ function renderEdges() {
     let fromSide, toSide;
 
     if (dy > 0) {
-      // toNode is under fromNode
       fromSide = 'bottom';
       toSide = 'top';
     } else if (dy < 0) {
-      // toNode is above fromNode
       fromSide = 'top';
       toSide = 'bottom';
     } else {
-      // same vertical level (or very close) → horizontal
       if (dx >= 0) {
         fromSide = 'right';
         toSide = 'left';
@@ -84,14 +75,13 @@ function renderEdges() {
       }
     }
 
-
     const fromPorts = computePortPositions(fromNode);
     const toPorts = computePortPositions(toNode);
     const from = fromPorts[fromSide];
     const to = toPorts[toSide];
     if (!from || !to) return;
 
-    const points = manhattanRouteWithOutward(from, fromSide, to, toSide);
+    const points = simpleManhattanRoute(from, to);
     const d = points
       .map((p, i) => (i === 0 ? 'M' : 'L') + ' ' + p.x + ' ' + p.y)
       .join(' ');
@@ -104,33 +94,30 @@ function renderEdges() {
   });
 }
 
-/**
- * Better orthogonal routing:
- *  - from port -> small outward step (normal to node border)
- *  - orthogonal path between "outer" points
- *  - small inward step into target port
- */
-function manhattanRouteWithOutward(from, fromSide, to, toSide) {
-  const offset = 20; // distance from node border before turning
-
-  const fromOut = outwardPoint(from, fromSide, offset);
-  const toOut = outwardPoint(to, toSide, offset);
-
+function simpleManhattanRoute(from, to) {
   const points = [];
-  points.push({ x: from.x, y: from.y });      // exact port start
-  points.push(fromOut);                       // step outward
 
-  // Route between fromOut and toOut with simple L-shape
-  const intermediates = orthogonalBetween(fromOut, toOut);
-  points.push(...intermediates);
+  points.push({ x: from.x, y: from.y });
 
-  points.push(toOut);                         // approach outside target
-  points.push({ x: to.x, y: to.y });         // exact target port
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+
+  if (Math.abs(dx) < 1 || Math.abs(dy) < 1) {
+    points.push({ x: to.x, y: to.y });
+    return points;
+  }
+
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    points.push({ x: to.x, y: from.y });
+  } else {
+    points.push({ x: from.x, y: to.y });
+  }
+
+  points.push({ x: to.x, y: to.y });
 
   return points;
 }
 
-/** Outward from a side by offset (normal direction). */
 function outwardPoint(p, side, offset) {
   switch (side) {
     case 'top':
@@ -146,23 +133,15 @@ function outwardPoint(p, side, offset) {
   }
 }
 
-/**
- * Simple orthogonal route between two points:
- * at least one 90° bend, no lying directly on node borders
- * (since we already stepped outward).
- */
 function orthogonalBetween(a, b) {
   const pts = [];
   const dx = b.x - a.x;
   const dy = b.y - a.y;
 
   if (dx === 0 || dy === 0) {
-    // already aligned horizontally or vertically
-    // no extra midpoints needed
     return pts;
   }
 
-  // Horizontal preference if |dx| >= |dy|
   if (Math.abs(dx) >= Math.abs(dy)) {
     const midX = a.x + dx / 2;
     pts.push({ x: midX, y: a.y });
@@ -203,7 +182,7 @@ function renderNode(node) {
   label.textContent = capitalize(node.type);
   g.appendChild(label);
 
-  // 3) ports (maradhatnak a node.x/node.width alapján)
+  // 3) ports
   const ports = computePortPositions(node);
   Object.entries(ports).forEach(([name, pos]) => {
     const port = document.createElementNS(SVG_NS, 'circle');
@@ -216,12 +195,10 @@ function renderNode(node) {
     g.appendChild(port);
   });
 
-  // 4) először fűzzük be a groupot az SVG-be, hogy legyen bbox
   svg.appendChild(g);
 
-  // 5) csak most rakjuk ki a resize handle-t, a VALÓDI bbox alapján
   if (isSelected) {
-    const bbox = g.getBBox();      // <- tényleges határoló téglalap
+    const bbox = g.getBBox();      
     const handleSize = 8;
 
     const handle = document.createElementNS(SVG_NS, 'rect');
@@ -236,239 +213,4 @@ function renderNode(node) {
   }
 }
 
-function createBodyShape(node) {
-  const x = node.x;
-  const y = node.y;
-  const w = node.width;
-  const h = node.height;
-
-  let body;
-
-  switch (node.type) {
-    /* --- START (pill) ----------------------------------------------------- */
-    case 'start': {
-      body = document.createElementNS(SVG_NS, 'rect');
-      body.setAttribute('x', x);
-      body.setAttribute('y', y);
-      body.setAttribute('width', w);
-      body.setAttribute('height', h);
-      // pill: radius = half height
-      body.setAttribute('rx', h / 2);
-      body.setAttribute('ry', h / 2);
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- STATE (rounded rectangle) --------------------------------------- */
-    case 'state': {
-      body = document.createElementNS(SVG_NS, 'rect');
-      body.setAttribute('x', x);
-      body.setAttribute('y', y);
-      body.setAttribute('width', w);
-      body.setAttribute('height', h);
-      body.setAttribute('rx', h / 4);
-      body.setAttribute('ry', h / 4);
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- INPUT (flag on right) ------------------------------------------- */
-    case 'input': {
-      body = document.createElementNS(SVG_NS, 'polygon');
-      const flagWidth = w * -0.2;
-      
-      const points = [
-        [x,           y],
-        [x + w - flagWidth, y],
-        [x + w,       y + h / 2],
-        [x + w - flagWidth, y + h],
-        [x,           y + h]
-      ];
-      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- OUTPUT (arrow on right) ----------------------------------------- */
-    case 'output': {
-      body = document.createElementNS(SVG_NS, 'polygon');
-      const arrowWidth = w * 0.3;
-      const points = [
-        [x,              y],
-        [x + w - arrowWidth, y],
-        [x + w,          y + h / 2],
-        [x + w - arrowWidth, y + h],
-        [x,              y + h]
-      ];
-      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- START TIMER (rect + small star/plus on left) -------------------- */
-    case 'startTimer': {
-      body = document.createElementNS(SVG_NS, 'g');
-
-      const rect = document.createElementNS(SVG_NS, 'rect');
-      rect.setAttribute('x', x);
-      rect.setAttribute('y', y);
-      rect.setAttribute('width', w);
-      rect.setAttribute('height', h);
-      rect.setAttribute('fill', '#ffffff');
-      rect.setAttribute('stroke', '#000');
-      rect.setAttribute('stroke-width', '1');
-      body.appendChild(rect);
-
-      const cx = x + 10;
-      const cy = y + h / 2;
-      const r = 4;
-
-      const v = document.createElementNS(SVG_NS, 'line');
-      v.setAttribute('x1', cx);
-      v.setAttribute('y1', cy - r);
-      v.setAttribute('x2', cx);
-      v.setAttribute('y2', cy + r);
-      v.setAttribute('stroke', '#000');
-      v.setAttribute('stroke-width', '1');
-      body.appendChild(v);
-
-      const hLine = document.createElementNS(SVG_NS, 'line');
-      hLine.setAttribute('x1', cx - r);
-      hLine.setAttribute('y1', cy);
-      hLine.setAttribute('x2', cx + r);
-      hLine.setAttribute('y2', cy);
-      hLine.setAttribute('stroke', '#000');
-      hLine.setAttribute('stroke-width', '1');
-      body.appendChild(hLine);
-
-      break;
-    }
-
-    /* --- STOP TIMER (rect + small X on left) ----------------------------- */
-    case 'stopTimer': {
-      body = document.createElementNS(SVG_NS, 'g');
-
-      const rect = document.createElementNS(SVG_NS, 'rect');
-      rect.setAttribute('x', x);
-      rect.setAttribute('y', y);
-      rect.setAttribute('width', w);
-      rect.setAttribute('height', h);
-      rect.setAttribute('fill', '#ffffff');
-      rect.setAttribute('stroke', '#000');
-      rect.setAttribute('stroke-width', '1');
-      body.appendChild(rect);
-
-      const cx = x + 10;
-      const cy = y + h / 2;
-      const r = 4;
-
-      const l1 = document.createElementNS(SVG_NS, 'line');
-      l1.setAttribute('x1', cx - r);
-      l1.setAttribute('y1', cy - r);
-      l1.setAttribute('x2', cx + r);
-      l1.setAttribute('y2', cy + r);
-      l1.setAttribute('stroke', '#000');
-      l1.setAttribute('stroke-width', '1');
-      body.appendChild(l1);
-
-      const l2 = document.createElementNS(SVG_NS, 'line');
-      l2.setAttribute('x1', cx - r);
-      l2.setAttribute('y1', cy + r);
-      l2.setAttribute('x2', cx + r);
-      l2.setAttribute('y2', cy - r);
-      l2.setAttribute('stroke', '#000');
-      l2.setAttribute('stroke-width', '1');
-      body.appendChild(l2);
-
-      break;
-    }
-
-    /* --- DECISION (diamond) ---------------------------------------------- */
-    case 'decision': {
-      body = document.createElementNS(SVG_NS, 'polygon');
-      const points = [
-        [x + w / 2, y],
-        [x + w,     y + h / 2],
-        [x + w / 2, y + h],
-        [x,         y + h / 2]
-      ];
-      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- DECLARATION (rect with folded top-right corner) ----------------- */
-    case 'declaration': {
-      body = document.createElementNS(SVG_NS, 'polygon');
-      const fold = Math.min(10, w * 0.2);
-      const points = [
-        [x,          y],
-        [x + w - fold, y],
-        [x + w,      y + fold],
-        [x + w,      y + h],
-        [x,          y + h]
-      ];
-      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-
-    /* --- CREATE TASK (rect with bottom bar) ------------------------------ */
-    case 'createTask': {
-      body = document.createElementNS(SVG_NS, 'g');
-
-      const rect = document.createElementNS(SVG_NS, 'rect');
-      rect.setAttribute('x', x);
-      rect.setAttribute('y', y);
-      rect.setAttribute('width', w);
-      rect.setAttribute('height', h);
-      rect.setAttribute('fill', '#ffffff');
-      rect.setAttribute('stroke', '#000');
-      rect.setAttribute('stroke-width', '1');
-      body.appendChild(rect);
-
-      const line = document.createElementNS(SVG_NS, 'line');
-      line.setAttribute('x1', x);
-      line.setAttribute('y1', y + h - 4);
-      line.setAttribute('x2', x + w);
-      line.setAttribute('y2', y + h - 4);
-      line.setAttribute('stroke', '#000');
-      line.setAttribute('stroke-width', '1');
-      body.appendChild(line);
-
-      break;
-    }
-
-    /* --- PLAIN C CODE / PROCESS (simple rect) ---------------------------- */
-    case 'code':
-    case 'process':
-    default: {
-      body = document.createElementNS(SVG_NS, 'rect');
-      body.setAttribute('x', x);
-      body.setAttribute('y', y);
-      body.setAttribute('width', w);
-      body.setAttribute('height', h);
-      body.setAttribute('rx', 0);
-      body.setAttribute('ry', 0);
-      body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#000');
-      body.setAttribute('stroke-width', '1');
-      break;
-    }
-  }
-
-  return body;
-}
 

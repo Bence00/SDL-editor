@@ -1,0 +1,68 @@
+{
+    "version": 1,
+    "nodes": [
+        {
+            "id": "1",
+            "type": "start",
+            "x": 280,
+            "y": 120,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "2",
+            "type": "state",
+            "x": 440,
+            "y": 380,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "4",
+            "type": "state",
+            "x": 140,
+            "y": 380,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "6",
+            "type": "decision",
+            "x": 300,
+            "y": 580,
+            "width": 120,
+            "height": 60
+        }
+    ],
+    "edges": [
+        {
+            "id": "e3",
+            "fromNodeId": "1",
+            "fromPort": "bottom",
+            "toNodeId": "2",
+            "toPort": "bottom"
+        },
+        {
+            "id": "e5",
+            "fromNodeId": "1",
+            "fromPort": "bottom",
+            "toNodeId": "4",
+            "toPort": "top"
+        },
+        {
+            "id": "e7",
+            "fromNodeId": "4",
+            "fromPort": "bottom",
+            "toNodeId": "6",
+            "toPort": "top"
+        },
+        {
+            "id": "e8",
+            "fromNodeId": "2",
+            "fromPort": "bottom",
+            "toNodeId": "6",
+            "toPort": "top"
+        }
+    ],
+    "nextId": 9
+}

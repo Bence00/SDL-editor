@@ -1,8 +1,6 @@
-// src/storage.js
 import { state } from './state.js';
 import { render } from './render.js';
 
-/** Build a serializable object representing the current diagram. */
 export function exportDiagram() {
   return {
     version: 1,
@@ -25,10 +23,6 @@ export function exportDiagram() {
   };
 }
 
-/**
- * Load a diagram object into state.
- * Expects the same shape as exportDiagram().
- */
 export function importDiagram(diagram) {
   if (!diagram || !Array.isArray(diagram.nodes) || !Array.isArray(diagram.edges)) {
     console.error('Invalid diagram object', diagram);

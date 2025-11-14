@@ -17,15 +17,13 @@ function applyGridVisual() {
 }
 
 if (snapCheckbox) {
-  // induláskori állapot
   setSnapToGrid(snapCheckbox.checked);
   applyGridVisual();
 
-  // ha változik a checkbox
   snapCheckbox.addEventListener('change', () => {
-    setSnapToGrid(snapCheckbox.checked);  // logika: snap ON/OFF
-    applyGridVisual();                    // vizuál: grid háttér ON/OFF
-    render();                             // ha kell, újrarajzolod a node-okat
+    setSnapToGrid(snapCheckbox.checked);  
+    applyGridVisual();                    
+    render();                             
   });
 }
 
@@ -79,4 +77,3 @@ if (btnLoad) {
     loadDiagram(name);
   });
 }
-// Expose for quick testing in console, or wire to buttons:

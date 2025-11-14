@@ -4,65 +4,60 @@
         {
             "id": "1",
             "type": "start",
-            "x": 280,
-            "y": 120,
+            "x": 220,
+            "y": 110,
             "width": 120,
             "height": 60
         },
         {
             "id": "2",
             "type": "state",
-            "x": 440,
-            "y": 380,
+            "x": 220,
+            "y": 190,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "3",
+            "type": "input",
+            "x": 220,
+            "y": 280,
             "width": 120,
             "height": 60
         },
         {
             "id": "4",
-            "type": "state",
-            "x": 140,
-            "y": 380,
+            "type": "output",
+            "x": 220,
+            "y": 360,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "5",
+            "type": "decision",
+            "x": 220,
+            "y": 440,
             "width": 120,
             "height": 60
         },
         {
             "id": "6",
-            "type": "decision",
-            "x": 300,
-            "y": 580,
+            "type": "createTask",
+            "x": 220,
+            "y": 530,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "7",
+            "type": "stop",
+            "x": 220,
+            "y": 620,
             "width": 120,
             "height": 60
         }
     ],
-    "edges": [
-        {
-            "id": "e3",
-            "fromNodeId": "1",
-            "fromPort": "bottom",
-            "toNodeId": "2",
-            "toPort": "bottom"
-        },
-        {
-            "id": "e5",
-            "fromNodeId": "1",
-            "fromPort": "bottom",
-            "toNodeId": "4",
-            "toPort": "top"
-        },
-        {
-            "id": "e7",
-            "fromNodeId": "4",
-            "fromPort": "bottom",
-            "toNodeId": "6",
-            "toPort": "top"
-        },
-        {
-            "id": "e8",
-            "fromNodeId": "2",
-            "fromPort": "bottom",
-            "toNodeId": "6",
-            "toPort": "top"
-        }
-    ],
-    "nextId": 9
+    "edges": [],
+    "nextId": 8
 }

@@ -1,7 +1,7 @@
 import { state, selectNode } from './state.js';
 
 export function createNode(type, x, y) {
-  const baseSize = { width: 120, height: 60 };
+  const baseSize = { width: 140, height: 80 };
 
   const node = {
     id: String(state.nextId++),
@@ -66,7 +66,6 @@ export function computePortPositions(node) {
   };
 }
 
-/** Delete node + all incident edges. Returns true if something was deleted. */
 export function deleteNode(nodeId) {
   const idx = state.nodes.findIndex(n => n.id === nodeId);
   if (idx === -1) return false;

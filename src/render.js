@@ -1,11 +1,19 @@
+// render.js
+// Responsible for rendering the full SDL diagram to the main SVG element.
+
 import { SVG_NS } from './constants.js';
 import { svg } from './dom.js';
 import { state } from './state.js';
-import { getNodeById, computePortPositions } from './model.js';
-import { capitalize } from './utils.js';
-import { createBodyShape } from './nodeShapes.js';
+import { getNodeById } from './model.js';
+import {
+  createBodyShape,
+  computePortPositions,
+  getNodeLabel
+} from './nodeShapes.js';
 
-
+/**
+ * Entry point: clears SVG and renders edges + all nodes.
+ */
 export function render() {
   clearSvg();
   ensureDefs();
@@ -13,14 +21,21 @@ export function render() {
   state.nodes.forEach(renderNode);
 }
 
+/**
+ * Remove all children from the root SVG.
+ */
 function clearSvg() {
   while (svg.firstChild) {
     svg.removeChild(svg.firstChild);
   }
 }
 
+/**
+ * Ensure definitions (like arrow markers) exist in the SVG.
+ */
 function ensureDefs() {
   const defs = document.createElementNS(SVG_NS, 'defs');
+
   const marker = document.createElementNS(SVG_NS, 'marker');
   marker.setAttribute('id', 'arrowhead');
   marker.setAttribute('viewBox', '0 0 10 10');
@@ -39,6 +54,9 @@ function ensureDefs() {
   svg.appendChild(defs);
 }
 
+/**
+ * Render all edges between nodes.
+ */
 function renderEdges() {
   state.edges.forEach(edge => {
     const fromNode = getNodeById(edge.fromNodeId);
@@ -57,15 +75,21 @@ function renderEdges() {
     const dx = toCenter.x - fromCenter.x;
     const dy = toCenter.y - fromCenter.y;
 
-    let fromSide, toSide;
+    let fromSide;
+    let toSide;
 
-    if (dy > 0) {
-      fromSide = 'bottom';
-      toSide = 'top';
-    } else if (dy < 0) {
-      fromSide = 'top';
-      toSide = 'bottom';
+    // Choose the most "natural" side to connect based on centers
+    if (Math.abs(dy) > Math.abs(dx)) {
+      // Mostly vertical
+      if (dy > 0) {
+        fromSide = 'bottom';
+        toSide = 'top';
+      } else {
+        fromSide = 'top';
+        toSide = 'bottom';
+      }
     } else {
+      // Mostly horizontal
       if (dx >= 0) {
         fromSide = 'right';
         toSide = 'left';
@@ -94,6 +118,9 @@ function renderEdges() {
   });
 }
 
+/**
+ * Very simple Manhattan routing: from -> horizontal/vertical bend -> to.
+ */
 function simpleManhattanRoute(from, to) {
   const points = [];
 
@@ -102,11 +129,13 @@ function simpleManhattanRoute(from, to) {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
 
+  // If almost aligned, just draw a straight line
   if (Math.abs(dx) < 1 || Math.abs(dy) < 1) {
     points.push({ x: to.x, y: to.y });
     return points;
   }
 
+  // One bend in the "dominant" axis
   if (Math.abs(dx) >= Math.abs(dy)) {
     points.push({ x: to.x, y: from.y });
   } else {
@@ -117,6 +146,9 @@ function simpleManhattanRoute(from, to) {
 
   return points;
 }
+
+// These helpers are currently unused, but kept for potential
+// future, more advanced routing logic.
 
 function outwardPoint(p, side, offset) {
   switch (side) {
@@ -155,6 +187,9 @@ function orthogonalBetween(a, b) {
   return pts;
 }
 
+/**
+ * Render a single node group (<g>): body, label, ports, and resize handle.
+ */
 function renderNode(node) {
   const g = document.createElementNS(SVG_NS, 'g');
   g.classList.add('node');
@@ -168,21 +203,24 @@ function renderNode(node) {
     g.classList.add('selected');
   }
 
-  // 1) shape
+  // 1) Shape (type-specific)
   const body = createBodyShape(node);
   g.appendChild(body);
 
-  // 2) label
-  const label = document.createElementNS(SVG_NS, 'text');
-  label.setAttribute('x', node.x + node.width / 2);
-  label.setAttribute('y', node.y + node.height / 2 + 4);
-  label.setAttribute('text-anchor', 'middle');
-  label.setAttribute('font-size', '13');
-  label.setAttribute('fill', '#333');
-  label.textContent = capitalize(node.type);
-  g.appendChild(label);
+  // 2) Label (optional, type-specific)
+  const text = getNodeLabel(node);
+  if (text) {
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', node.x + node.width / 2);
+    label.setAttribute('y', node.y + node.height / 2 + 4);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-size', '13');
+    label.setAttribute('fill', '#333');
+    label.textContent = text;
+    g.appendChild(label);
+  }
 
-  // 3) ports
+  // 3) Ports (type-specific positions)
   const ports = computePortPositions(node);
   Object.entries(ports).forEach(([name, pos]) => {
     const port = document.createElementNS(SVG_NS, 'circle');
@@ -197,8 +235,9 @@ function renderNode(node) {
 
   svg.appendChild(g);
 
+  // 4) Resize handle for selected nodes
   if (isSelected) {
-    const bbox = g.getBBox();      
+    const bbox = g.getBBox();
     const handleSize = 8;
 
     const handle = document.createElementNS(SVG_NS, 'rect');
@@ -212,5 +251,3 @@ function renderNode(node) {
     g.appendChild(handle);
   }
 }
-
-

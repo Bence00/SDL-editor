@@ -141,7 +141,6 @@ function onDocumentMouseMove(e) {
     render();
 }
 
-
   // resizing
   if (state.resizing) {
     const { nodeId, startWidth, startHeight, startMouseX, startMouseY } =
@@ -221,20 +220,65 @@ function onDocumentMouseUp(e) {
   if (state.connecting) {
     const { fromNodeId, fromPort } = state.connecting;
 
+    let toNodeId = null;
+    let toPort = null;
+
+    // 1) Először próbáljunk konkrét portot találni (régi logika)
     let portEl =
       (e.target && e.target.closest && e.target.closest('.port')) || null;
     if (!portEl) {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      portEl = el && el.closest('.port');
+      portEl = el && el.closest && el.closest('.port');
     }
 
     if (portEl) {
-      const toNodeId = portEl.dataset.nodeId;
-      const toPort = portEl.dataset.port;
+      // ha konkrét porton engedtük el, használjuk azt
+      toNodeId = portEl.dataset.nodeId;
+      toPort = portEl.dataset.port;
+    } else {
+      // 2) NINCS port – nézzük meg, hogy egy node fölött vagyunk-e
+      let nodeEl =
+        (e.target && e.target.closest && e.target.closest('.node')) || null;
+
+      if (!nodeEl) {
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        nodeEl = el && el.closest && el.closest('.node');
+      }
+
+      if (nodeEl) {
+        toNodeId = nodeEl.dataset.id;
+        const node = getNodeById(toNodeId);
+        if (node) {
+          // kurzor pozíció SVG koordinátában
+          const ptSvg = clientToSvgPoint(e.clientX, e.clientY);
+
+          const leftDist   = Math.abs(ptSvg.x - node.x);
+          const rightDist  = Math.abs(ptSvg.x - (node.x + node.width));
+          const topDist    = Math.abs(ptSvg.y - node.y);
+          const bottomDist = Math.abs(ptSvg.y - (node.y + node.height));
+
+          const min = Math.min(leftDist, rightDist, topDist, bottomDist);
+
+          if (min === leftDist) {
+            toPort = 'left';
+          } else if (min === rightDist) {
+            toPort = 'right';
+          } else if (min === topDist) {
+            toPort = 'top';
+          } else {
+            toPort = 'bottom';
+          }
+        }
+      }
+    }
+
+    // Ha találtunk node-ot és portot, létrehozzuk az élt
+    if (toNodeId && toPort) {
       createEdge(fromNodeId, fromPort, toNodeId, toPort);
       render();
     }
 
+    // ideiglenes vonal eltakarítása
     if (state.connecting.tempLine && state.connecting.tempLine.parentNode) {
       state.connecting.tempLine.parentNode.removeChild(
         state.connecting.tempLine
@@ -242,6 +286,7 @@ function onDocumentMouseUp(e) {
     }
     state.connecting = null;
   }
+
 
   state.dragging = null;
   state.resizing = null;

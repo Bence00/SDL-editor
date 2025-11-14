@@ -2,22 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SDL Editor (Modular)</title>
+  <title>SDL Editor</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div id="app">
+
+    <!-- Sidebar / Palette -->
     <aside id="palette">
-      <h2>SDL Palette</h2>
-      <div class="palette-item" draggable="true" data-node-type="process">Process</div>
-      <div class="palette-item" draggable="true" data-node-type="state">State</div>
-      <div class="palette-item" draggable="true" data-node-type="decision">Decision</div>
-      <div class="palette-item" draggable="true" data-node-type="signal">Signal</div>
+
+      <h2>SDL</h2>
+
+      <!-- Grid toggle -->
+      <div class="control-group">
+        <label id="snapToggle">
+          <input type="checkbox" id="snapToGridCheckbox" checked />
+          Snap to grid
+        </label>
+      </div>
+
+      <!-- Save / Load buttons -->
+      <div class="control-group">
+        <button id="btnSave">💾 Save</button>
+        <button id="btnLoad">📂 Load</button>
+      </div>
+
+      <!-- Component List -->
+        <div id="paletteItems">
+        <!-- Bal oszlop: Start, State, Input, Output, Plain C code -->
+        <div class="palette-group-title">Basic</div>
+        <div class="palette-item" draggable="true" data-node-type="start">Start</div>
+        <div class="palette-item" draggable="true" data-node-type="state">State</div>
+        <div class="palette-item" draggable="true" data-node-type="input">Input</div>
+        <div class="palette-item" draggable="true" data-node-type="output">Output</div>
+        <div class="palette-item" draggable="true" data-node-type="code">Plain C code</div>
+        <div class="palette-item" draggable="true" data-node-type="startTimer">Start timer</div>
+        <div class="palette-item" draggable="true" data-node-type="stopTimer">Stop timer</div>
+        <div class="palette-item" draggable="true" data-node-type="decision">Decision</div>
+        <div class="palette-item" draggable="true" data-node-type="declaration">Declarations</div>
+        <div class="palette-item" draggable="true" data-node-type="createTask">Create task</div>
+        </div>
+
     </aside>
 
+    <!-- Main Editor Canvas -->
     <main id="editor">
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
     </main>
+
   </div>
 
   <!-- Entry point -->

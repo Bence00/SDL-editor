@@ -1,6 +1,5 @@
-// src/interactions.js
 import { svg, palette } from './dom.js';
-import { state, selectNode } from './state.js';
+import { state, selectNode, isSnapToGrid } from './state.js';
 import {
   createNode,
   createEdge,
@@ -8,12 +7,12 @@ import {
   deleteNode
 } from './model.js';
 import { render } from './render.js';
-import { clientToSvgPoint } from './utils.js';
+import { clientToSvgPoint, snapPointToGrid } from './utils.js';
 import { SVG_NS } from './constants.js';
 
-let selectionStart = null;      // { x, y } in SVG coords
-let selectionRectEl = null;     // SVG <rect> for marquee
-const SELECTION_DRAG_THRESHOLD = 3; // px
+let selectionStart = null;
+let selectionRectEl = null;
+const SELECTION_DRAG_THRESHOLD = 3;
 
 export function initInteractions() {
   initPaletteDrag();
@@ -45,7 +44,9 @@ function initCanvasDnD() {
     if (!type) return;
 
     const pt = clientToSvgPoint(e.clientX, e.clientY);
-    createNode(type, pt.x, pt.y);
+    const pos = isSnapToGrid() ? snapPointToGrid(pt.x, pt.y) : pt;
+
+    createNode(type, pos.x, pos.y);
     render();
   });
 }
@@ -64,11 +65,9 @@ function onSvgMouseDown(e) {
     const pt = clientToSvgPoint(e.clientX, e.clientY);
     selectionStart = pt;
 
-    // clear current selection visually
     state.selectedNodeId = null;
     state.selectedNodeIds = [];
 
-    // create selection rect
     if (!selectionRectEl) {
       selectionRectEl = document.createElementNS(SVG_NS, 'rect');
       selectionRectEl.classList.add('selection-rect');
@@ -85,19 +84,16 @@ function onSvgMouseDown(e) {
 
   const target = e.target;
 
-  // Resize
   if (target.classList.contains('resize-handle')) {
     startResizing(e, target);
     return;
   }
 
-  // Connection
   if (target.classList.contains('port')) {
     startConnecting(e, target);
     return;
   }
 
-  // Node drag (single or multi)
   const nodeGroup = target.closest('.node');
   if (nodeGroup) {
     startDragging(e, nodeGroup);
@@ -107,11 +103,10 @@ function onSvgMouseDown(e) {
 function onDocumentMouseMove(e) {
   const pt = clientToSvgPoint(e.clientX, e.clientY);
 
-  // --- selection box drag ---
+  // selection box drag
   if (selectionStart) {
     const dx = pt.x - selectionStart.x;
     const dy = pt.y - selectionStart.y;
-
     const x = dx < 0 ? pt.x : selectionStart.x;
     const y = dy < 0 ? pt.y : selectionStart.y;
     const w = Math.abs(dx);
@@ -123,33 +118,52 @@ function onDocumentMouseMove(e) {
     selectionRectEl.setAttribute('height', h);
   }
 
-  // --- dragging nodes ---
+  // dragging nodes (multi)
   if (state.dragging && state.dragging.nodes) {
     state.dragging.nodes.forEach(entry => {
       const node = getNodeById(entry.id);
       if (node) {
-        node.x = pt.x - entry.offsetX;
-        node.y = pt.y - entry.offsetY;
+        let newX = pt.x - entry.offsetX;
+        let newY = pt.y - entry.offsetY;
+
+        if (isSnapToGrid()) {
+          const snapped = snapPointToGrid(newX, newY);
+          newX = snapped.x;
+          newY = snapped.y;
+        }
+
+        node.x = newX;
+        node.y = newY;
       }
     });
     render();
   }
 
-  // --- resizing ---
+  // resizing
   if (state.resizing) {
     const { nodeId, startWidth, startHeight, startMouseX, startMouseY } =
       state.resizing;
     const node = getNodeById(nodeId);
     if (node) {
-      const dx2 = pt.x - startMouseX;
-      const dy2 = pt.y - startMouseY;
-      node.width = Math.max(40, startWidth + dx2);
-      node.height = Math.max(30, startHeight + dy2);
+      let dx2 = pt.x - startMouseX;
+      let dy2 = pt.y - startMouseY;
+      let w = Math.max(40, startWidth + dx2);
+      let h = Math.max(30, startHeight + dy2);
+
+      // (optional) snap resize
+      if (isSnapToGrid()) {
+        const snapped = snapPointToGrid(w, h);
+        w = snapped.x;
+        h = snapped.y;
+      }
+
+      node.width = w;
+      node.height = h;
       render();
     }
   }
 
-  // --- moving connection preview ---
+  // moving connection preview
   if (state.connecting && state.connecting.tempLine) {
     state.connecting.tempLine.setAttribute('x2', pt.x);
     state.connecting.tempLine.setAttribute('y2', pt.y);
@@ -159,13 +173,12 @@ function onDocumentMouseMove(e) {
 function onDocumentMouseUp(e) {
   const pt = clientToSvgPoint(e.clientX, e.clientY);
 
-  // Finish marquee selection
+  // finish marquee selection
   if (selectionStart) {
     const dx = pt.x - selectionStart.x;
     const dy = pt.y - selectionStart.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // If we barely moved, treat as "click empty -> clear selection"
     if (dist >= SELECTION_DRAG_THRESHOLD) {
       const x1 = Math.min(selectionStart.x, pt.x);
       const y1 = Math.min(selectionStart.y, pt.y);
@@ -183,21 +196,17 @@ function onDocumentMouseUp(e) {
           nx1 < x2 && nx2 > x1 &&
           ny1 < y2 && ny2 > y1;
 
-        if (intersects) {
-          selectedIds.push(node.id);
-        }
+        if (intersects) selectedIds.push(node.id);
       });
 
       state.selectedNodeIds = selectedIds;
       state.selectedNodeId =
         selectedIds.length === 1 ? selectedIds[0] : null;
     } else {
-      // just a click on empty space
       state.selectedNodeId = null;
       state.selectedNodeIds = [];
     }
 
-    // remove selection rect
     if (selectionRectEl && selectionRectEl.parentNode) {
       selectionRectEl.parentNode.removeChild(selectionRectEl);
     }
@@ -205,13 +214,12 @@ function onDocumentMouseUp(e) {
     render();
   }
 
-  // Finish connection
+  // finish connection
   if (state.connecting) {
     const { fromNodeId, fromPort } = state.connecting;
 
     let portEl =
       (e.target && e.target.closest && e.target.closest('.port')) || null;
-
     if (!portEl) {
       const el = document.elementFromPoint(e.clientX, e.clientY);
       portEl = el && el.closest('.port');
@@ -232,7 +240,6 @@ function onDocumentMouseUp(e) {
     state.connecting = null;
   }
 
-  // ALWAYS stop dragging / resizing
   state.dragging = null;
   state.resizing = null;
 }
@@ -247,12 +254,10 @@ function startDragging(e, nodeGroup) {
 
   const pt = clientToSvgPoint(e.clientX, e.clientY);
 
-  // If clicked node is not already in selection, reset selection to this node
   if (!state.selectedNodeIds.includes(clickedId)) {
     selectNode(clickedId);
   }
 
-  // Drag all selected nodes
   const nodesToDrag = state.selectedNodeIds.length
     ? state.selectedNodeIds
     : [clickedId];
@@ -315,7 +320,6 @@ function startConnecting(e, port) {
 function initKeyboard() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Delete' || e.key === 'Backspace') {
-      // If multi-selection has anything, delete all of them
       const ids =
         state.selectedNodeIds && state.selectedNodeIds.length
           ? Array.from(new Set(state.selectedNodeIds))
@@ -324,9 +328,7 @@ function initKeyboard() {
           : [];
 
       if (ids.length) {
-        ids.forEach(id => {
-          deleteNode(id);
-        });
+        ids.forEach(id => deleteNode(id));
         state.selectedNodeId = null;
         state.selectedNodeIds = [];
         render();

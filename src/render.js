@@ -177,7 +177,7 @@ function orthogonalBetween(a, b) {
 }
 
 function renderNode(node) {
-    const g = document.createElementNS(SVG_NS, 'g');
+  const g = document.createElementNS(SVG_NS, 'g');
   g.classList.add('node');
   g.dataset.id = node.id;
 
@@ -189,9 +189,11 @@ function renderNode(node) {
     g.classList.add('selected');
   }
 
+  // 1) shape
   const body = createBodyShape(node);
   g.appendChild(body);
 
+  // 2) label
   const label = document.createElementNS(SVG_NS, 'text');
   label.setAttribute('x', node.x + node.width / 2);
   label.setAttribute('y', node.y + node.height / 2 + 4);
@@ -201,6 +203,7 @@ function renderNode(node) {
   label.textContent = capitalize(node.type);
   g.appendChild(label);
 
+  // 3) ports (maradhatnak a node.x/node.width alapján)
   const ports = computePortPositions(node);
   Object.entries(ports).forEach(([name, pos]) => {
     const port = document.createElementNS(SVG_NS, 'circle');
@@ -213,31 +216,183 @@ function renderNode(node) {
     g.appendChild(port);
   });
 
-  if (state.selectedNodeId === node.id) {
+  // 4) először fűzzük be a groupot az SVG-be, hogy legyen bbox
+  svg.appendChild(g);
+
+  // 5) csak most rakjuk ki a resize handle-t, a VALÓDI bbox alapján
+  if (isSelected) {
+    const bbox = g.getBBox();      // <- tényleges határoló téglalap
     const handleSize = 8;
+
     const handle = document.createElementNS(SVG_NS, 'rect');
     handle.classList.add('resize-handle');
-    handle.setAttribute('x', node.x + node.width - handleSize);
-    handle.setAttribute('y', node.y + node.height - handleSize);
+    handle.setAttribute('x', bbox.x + bbox.width - handleSize);
+    handle.setAttribute('y', bbox.y + bbox.height - handleSize);
     handle.setAttribute('width', handleSize);
     handle.setAttribute('height', handleSize);
     handle.dataset.nodeId = node.id;
+
     g.appendChild(handle);
   }
-
-  svg.appendChild(g);
 }
 
 function createBodyShape(node) {
+  const x = node.x;
+  const y = node.y;
+  const w = node.width;
+  const h = node.height;
+
   let body;
 
   switch (node.type) {
+    /* --- START (pill) ----------------------------------------------------- */
+    case 'start': {
+      body = document.createElementNS(SVG_NS, 'rect');
+      body.setAttribute('x', x);
+      body.setAttribute('y', y);
+      body.setAttribute('width', w);
+      body.setAttribute('height', h);
+      // pill: radius = half height
+      body.setAttribute('rx', h / 2);
+      body.setAttribute('ry', h / 2);
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
+      break;
+    }
+
+    /* --- STATE (rounded rectangle) --------------------------------------- */
+    case 'state': {
+      body = document.createElementNS(SVG_NS, 'rect');
+      body.setAttribute('x', x);
+      body.setAttribute('y', y);
+      body.setAttribute('width', w);
+      body.setAttribute('height', h);
+      body.setAttribute('rx', h / 4);
+      body.setAttribute('ry', h / 4);
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
+      break;
+    }
+
+    /* --- INPUT (flag on right) ------------------------------------------- */
+    case 'input': {
+      body = document.createElementNS(SVG_NS, 'polygon');
+      const flagWidth = w * -0.2;
+      const points = [
+        [x,           y],
+        [x + w - flagWidth, y],
+        [x + w,       y + h / 2],
+        [x + w - flagWidth, y + h],
+        [x,           y + h]
+      ];
+      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
+      break;
+    }
+
+    /* --- OUTPUT (arrow on right) ----------------------------------------- */
+    case 'output': {
+      body = document.createElementNS(SVG_NS, 'polygon');
+      const arrowWidth = w * 0.3;
+      const points = [
+        [x,              y],
+        [x + w - arrowWidth, y],
+        [x + w,          y + h / 2],
+        [x + w - arrowWidth, y + h],
+        [x,              y + h]
+      ];
+      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
+      break;
+    }
+
+    /* --- START TIMER (rect + small star/plus on left) -------------------- */
+    case 'startTimer': {
+      body = document.createElementNS(SVG_NS, 'g');
+
+      const rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', h);
+      rect.setAttribute('fill', '#ffffff');
+      rect.setAttribute('stroke', '#000');
+      rect.setAttribute('stroke-width', '1');
+      body.appendChild(rect);
+
+      const cx = x + 10;
+      const cy = y + h / 2;
+      const r = 4;
+
+      const v = document.createElementNS(SVG_NS, 'line');
+      v.setAttribute('x1', cx);
+      v.setAttribute('y1', cy - r);
+      v.setAttribute('x2', cx);
+      v.setAttribute('y2', cy + r);
+      v.setAttribute('stroke', '#000');
+      v.setAttribute('stroke-width', '1');
+      body.appendChild(v);
+
+      const hLine = document.createElementNS(SVG_NS, 'line');
+      hLine.setAttribute('x1', cx - r);
+      hLine.setAttribute('y1', cy);
+      hLine.setAttribute('x2', cx + r);
+      hLine.setAttribute('y2', cy);
+      hLine.setAttribute('stroke', '#000');
+      hLine.setAttribute('stroke-width', '1');
+      body.appendChild(hLine);
+
+      break;
+    }
+
+    /* --- STOP TIMER (rect + small X on left) ----------------------------- */
+    case 'stopTimer': {
+      body = document.createElementNS(SVG_NS, 'g');
+
+      const rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', h);
+      rect.setAttribute('fill', '#ffffff');
+      rect.setAttribute('stroke', '#000');
+      rect.setAttribute('stroke-width', '1');
+      body.appendChild(rect);
+
+      const cx = x + 10;
+      const cy = y + h / 2;
+      const r = 4;
+
+      const l1 = document.createElementNS(SVG_NS, 'line');
+      l1.setAttribute('x1', cx - r);
+      l1.setAttribute('y1', cy - r);
+      l1.setAttribute('x2', cx + r);
+      l1.setAttribute('y2', cy + r);
+      l1.setAttribute('stroke', '#000');
+      l1.setAttribute('stroke-width', '1');
+      body.appendChild(l1);
+
+      const l2 = document.createElementNS(SVG_NS, 'line');
+      l2.setAttribute('x1', cx - r);
+      l2.setAttribute('y1', cy + r);
+      l2.setAttribute('x2', cx + r);
+      l2.setAttribute('y2', cy - r);
+      l2.setAttribute('stroke', '#000');
+      l2.setAttribute('stroke-width', '1');
+      body.appendChild(l2);
+
+      break;
+    }
+
+    /* --- DECISION (diamond) ---------------------------------------------- */
     case 'decision': {
       body = document.createElementNS(SVG_NS, 'polygon');
-      const x = node.x;
-      const y = node.y;
-      const w = node.width;
-      const h = node.height;
       const points = [
         [x + w / 2, y],
         [x + w,     y + h / 2],
@@ -245,49 +400,74 @@ function createBodyShape(node) {
         [x,         y + h / 2]
       ];
       body.setAttribute('points', points.map(p => p.join(',')).join(' '));
-      body.setAttribute('fill', '#fff7e6');
-      body.setAttribute('stroke', '#c27c0e');
-      body.setAttribute('stroke-width', '1.2');
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
       break;
     }
-    case 'signal': {
-      body = document.createElementNS(SVG_NS, 'ellipse');
-      body.setAttribute('cx', node.x + node.width / 2);
-      body.setAttribute('cy', node.y + node.height / 2);
-      body.setAttribute('rx', node.width / 2);
-      body.setAttribute('ry', node.height / 2);
-      body.setAttribute('fill', '#e3fafc');
-      body.setAttribute('stroke', '#0b7285');
-      body.setAttribute('stroke-width', '1.2');
+
+    /* --- DECLARATION (rect with folded top-right corner) ----------------- */
+    case 'declaration': {
+      body = document.createElementNS(SVG_NS, 'polygon');
+      const fold = Math.min(10, w * 0.2);
+      const points = [
+        [x,          y],
+        [x + w - fold, y],
+        [x + w,      y + fold],
+        [x + w,      y + h],
+        [x,          y + h]
+      ];
+      body.setAttribute('points', points.map(p => p.join(',')).join(' '));
+      body.setAttribute('fill', '#ffffff');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
       break;
     }
-    case 'state': {
-      body = document.createElementNS(SVG_NS, 'rect');
-      body.setAttribute('x', node.x);
-      body.setAttribute('y', node.y);
-      body.setAttribute('width', node.width);
-      body.setAttribute('height', node.height);
-      body.setAttribute('rx', 2);
-      body.setAttribute('ry', 2);
-      body.setAttribute('fill', '#eef3ff');
-      body.setAttribute('stroke', '#1f6feb');
-      body.setAttribute('stroke-width', '1.2');
+
+    /* --- CREATE TASK (rect with bottom bar) ------------------------------ */
+    case 'createTask': {
+      body = document.createElementNS(SVG_NS, 'g');
+
+      const rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', h);
+      rect.setAttribute('fill', '#ffffff');
+      rect.setAttribute('stroke', '#000');
+      rect.setAttribute('stroke-width', '1');
+      body.appendChild(rect);
+
+      const line = document.createElementNS(SVG_NS, 'line');
+      line.setAttribute('x1', x);
+      line.setAttribute('y1', y + h - 4);
+      line.setAttribute('x2', x + w);
+      line.setAttribute('y2', y + h - 4);
+      line.setAttribute('stroke', '#000');
+      line.setAttribute('stroke-width', '1');
+      body.appendChild(line);
+
       break;
     }
+
+    /* --- PLAIN C CODE / PROCESS (simple rect) ---------------------------- */
+    case 'code':
     case 'process':
     default: {
       body = document.createElementNS(SVG_NS, 'rect');
-      body.setAttribute('x', node.x);
-      body.setAttribute('y', node.y);
-      body.setAttribute('width', node.width);
-      body.setAttribute('height', node.height);
-      body.setAttribute('rx', 6);
-      body.setAttribute('ry', 6);
+      body.setAttribute('x', x);
+      body.setAttribute('y', y);
+      body.setAttribute('width', w);
+      body.setAttribute('height', h);
+      body.setAttribute('rx', 0);
+      body.setAttribute('ry', 0);
       body.setAttribute('fill', '#ffffff');
-      body.setAttribute('stroke', '#333');
-      body.setAttribute('stroke-width', '1.2');
+      body.setAttribute('stroke', '#000');
+      body.setAttribute('stroke-width', '1');
+      break;
     }
   }
 
   return body;
 }
+

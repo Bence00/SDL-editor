@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "nodes": [
+        {
+            "id": "1",
+            "type": "process",
+            "x": 220,
+            "y": 100,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "2",
+            "type": "state",
+            "x": 180,
+            "y": 240,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "id": "4",
+            "type": "signal",
+            "x": 120,
+            "y": 440,
+            "width": 120,
+            "height": 60
+        }
+    ],
+    "edges": [
+        {
+            "id": "e3",
+            "fromNodeId": "1",
+            "fromPort": "bottom",
+            "toNodeId": "2",
+            "toPort": "top"
+        },
+        {
+            "id": "e5",
+            "fromNodeId": "2",
+            "fromPort": "bottom",
+            "toNodeId": "4",
+            "toPort": "top"
+        }
+    ],
+    "nextId": 6
+}

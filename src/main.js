@@ -1,17 +1,31 @@
 import { render } from './render.js';
 import { initInteractions } from './interactions.js';
-import { snapCheckbox } from './dom.js';
+import { snapCheckbox, editorEl, btnSave, btnLoad } from './dom.js';
 import { setSnapToGrid } from './state.js';
 import { exportDiagram, importDiagram } from './storage.js';
-import { btnSave, btnLoad } from './dom.js';
 
 render();
 initInteractions();
 
+function applyGridVisual() {
+  if (!editorEl) return;
+  if (snapCheckbox && snapCheckbox.checked) {
+    editorEl.classList.add('grid-on');
+  } else {
+    editorEl.classList.remove('grid-on');
+  }
+}
+
 if (snapCheckbox) {
+  // induláskori állapot
   setSnapToGrid(snapCheckbox.checked);
+  applyGridVisual();
+
+  // ha változik a checkbox
   snapCheckbox.addEventListener('change', () => {
-    setSnapToGrid(snapCheckbox.checked);
+    setSnapToGrid(snapCheckbox.checked);  // logika: snap ON/OFF
+    applyGridVisual();                    // vizuál: grid háttér ON/OFF
+    render();                             // ha kell, újrarajzolod a node-okat
   });
 }
 

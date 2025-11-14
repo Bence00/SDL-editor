@@ -111,7 +111,7 @@ function renderEdges() {
  *  - small inward step into target port
  */
 function manhattanRouteWithOutward(from, fromSide, to, toSide) {
-  const offset = 14; // distance from node border before turning
+  const offset = 20; // distance from node border before turning
 
   const fromOut = outwardPoint(from, fromSide, offset);
   const toOut = outwardPoint(to, toSide, offset);
@@ -280,6 +280,7 @@ function createBodyShape(node) {
     case 'input': {
       body = document.createElementNS(SVG_NS, 'polygon');
       const flagWidth = w * -0.2;
+      
       const points = [
         [x,           y],
         [x + w - flagWidth, y],

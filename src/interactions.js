@@ -34,9 +34,7 @@ function initPaletteDrag() {
 }
 
 function initCanvasDnD() {
-  svg.addEventListener('dragover', e => {
-    e.preventDefault();
-  });
+  svg.addEventListener('dragover', e => e.preventDefault());
 
   svg.addEventListener('drop', e => {
     e.preventDefault();
@@ -44,12 +42,16 @@ function initCanvasDnD() {
     if (!type) return;
 
     const pt = clientToSvgPoint(e.clientX, e.clientY);
-    const pos = isSnapToGrid() ? snapPointToGrid(pt.x, pt.y) : pt;
+
+    const pos = isSnapToGrid()
+      ? snapPointToGrid(pt.x, pt.y)   // gridhez igazítjuk
+      : pt;
 
     createNode(type, pos.x, pos.y);
     render();
   });
 }
+
 
 /* ---------- MOUSE (DRAG / RESIZE / CONNECT / SELECT BOX) ---------- */
 
@@ -119,25 +121,26 @@ function onDocumentMouseMove(e) {
   }
 
   // dragging nodes (multi)
-  if (state.dragging && state.dragging.nodes) {
+    if (state.dragging && state.dragging.nodes) {
     state.dragging.nodes.forEach(entry => {
-      const node = getNodeById(entry.id);
-      if (node) {
+        const node = getNodeById(entry.id);
+        if (!node) return;
+
         let newX = pt.x - entry.offsetX;
         let newY = pt.y - entry.offsetY;
 
         if (isSnapToGrid()) {
-          const snapped = snapPointToGrid(newX, newY);
-          newX = snapped.x;
-          newY = snapped.y;
+        const snapped = snapPointToGrid(newX, newY);
+        newX = snapped.x;
+        newY = snapped.y;
         }
 
         node.x = newX;
         node.y = newY;
-      }
     });
     render();
-  }
+}
+
 
   // resizing
   if (state.resizing) {

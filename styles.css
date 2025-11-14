@@ -1,8 +1,10 @@
+/* ---- Alap layout ---- */
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 #app {
@@ -11,52 +13,108 @@ html, body {
   width: 100vw;
 }
 
-/* Palette */
+/* ---- Palette (sidebar) ---- */
+
 #palette {
   width: 240px;
   box-sizing: border-box;
   border-right: 1px solid #ddd;
   padding: 12px;
   background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 #palette h2 {
-  margin-top: 0;
+  margin: 0 0 8px 0;
   font-size: 16px;
+}
+
+#snapToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* gombok – Save / Load */
+
+#palette button {
+  display: inline-block;
+  padding: 6px 10px;
+  margin-right: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+#palette button:hover {
+  background: #f0f0f0;
+}
+
+#palette button:active {
+  transform: translateY(1px);
+}
+
+/* palette item lista */
+
+#paletteItems {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .palette-item {
   padding: 6px 8px;
-  margin-bottom: 6px;
   border-radius: 4px;
   border: 1px solid #ccc;
   background: #fff;
   cursor: grab;
   user-select: none;
+  font-size: 13px;
 }
 
 .palette-item:active {
   cursor: grabbing;
 }
 
-/* Editor canvas */
+/* ---- Editor + Canvas ---- */
+
 #editor {
   flex: 1;
   position: relative;
 }
 
+/* maga az SVG */
+
 #canvas {
   width: 100%;
   height: 100%;
   display: block;
-  background: #f5f5f5;
+  background: transparent; /* hogy a grid látszódjon */
 }
 
-/* Node styling */
+/* amikor a grid be van kapcsolva */
+
+#editor.grid-on {
+  background-image:
+    linear-gradient(to right, #d0d0d0 1px, transparent 2px),
+    linear-gradient(to bottom, #d0d0d0 1px, transparent 2px);
+  background-size: 20px 20px;
+}
+
+/* ---- Node-ok, portok, élek ---- */
+
 .node rect,
 .node ellipse,
 .node polygon {
   cursor: move;
+  shape-rendering: geometricPrecision;
 }
 
 .node.selected rect,
@@ -65,11 +123,7 @@ html, body {
   stroke: #007bff;
   stroke-width: 2;
 }
-#editor svg {
-  width: 100%;
-  height: 100%;
-}
-/* Resize handle */
+
 .resize-handle {
   fill: #fff;
   stroke: #007bff;
@@ -77,7 +131,8 @@ html, body {
   cursor: se-resize;
 }
 
-/* Ports */
+/* portok */
+
 .port {
   fill: #fff;
   stroke: #31d0c6;
@@ -85,12 +140,13 @@ html, body {
   cursor: crosshair;
 }
 
-/* Edges */
+/* élek */
+
 .edge-line {
   stroke: #444;
   stroke-width: 1.5;
   fill: none;
-  pointer-events: none; /* do NOT block ports */
+  pointer-events: none;
 }
 
 .temp-edge-line {
@@ -101,17 +157,12 @@ html, body {
   pointer-events: none;
 }
 
+/* kijelölő téglalap (rubber band selection) */
+
 .selection-rect {
   fill: rgba(0, 120, 215, 0.15);
   stroke: #0078d7;
   stroke-width: 1;
   stroke-dasharray: 4 2;
   pointer-events: none;
-}
-#snapToggle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  margin-bottom: 10px;
 }

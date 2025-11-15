@@ -1,4 +1,4 @@
-# SDL Diagram Editor
+# SDL-88 Diagram Editor
 
 A simple browser-based SDL (Specification and Description Language) diagram editor.  
 Supports placing, moving, resizing and connecting nodes, snap-to-grid, multi-selection, and save/load.

@@ -1,17 +1,19 @@
 (tasks in priority order)
 
+-reset to default size selected node(s)
 -ctrl selection
 -easier connect
 -proper connection edges
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
--arrows only after...
+-arrows only after...(protocol)
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
 -movement on the canvas
 -zoom in / zoom out       
 -long name breaks in nodes
 -rule-based connection validation
+-better save JSON format for future interpreter
 -SDL interpreter
 
 DONE:
@@ -19,6 +21,7 @@ DONE:
 -connection points only when selected/hover
 -edge select and delete
 -no text selection
--[BUG] while editing a label backspace shouldnt delete the node
+-[BUG] while editing a label, backspace shouldnt delete the node
 -load button -> panel with saved diagrams
--save/load naming without pop up default window
+-save naming without pop up default window
+-[BUG] termination, not proper connection edges in some cases (SOLVED by putting all 4 ports in the center, kinda lame)

@@ -193,13 +193,16 @@ const START_TYPE = {
     return body;
   }
 };
-// STOP
+// STOP/TERMINATE
 const STOP_TYPE = {
   defaultSize: { width: 40, height: 40 },
   showLabel: false,
 
   computePorts: manualPorts({
-     top:    { relX: 0.5, relY: 0.5 }
+     top:    { relX: 0.5, relY: 0.5 },
+     right:  { relX: 0.5, relY: 0.5 },
+     left:   { relX: 0.5, relY: 0.5 },
+     bottom: { relX: 0.5, relY: 0.5 }
   }),
 
   createBody(node) {

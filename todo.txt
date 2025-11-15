@@ -1,4 +1,5 @@
 -decision different branching names with save/load 
+-text label anywhere on the canvas
 -decision with more than 2 branches dinamically
 -reset to default size selected node(s)
 -ctrl selection
@@ -25,4 +26,4 @@ DONE:
 -load button -> panel with saved diagrams
 -save naming without pop up default window
 -[BUG] termination, not proper connection edges in some cases (SOLVED by putting all 4 ports in the center, kinda lame)
--only one edge from one port /decision
+-only one edge from one port except decision

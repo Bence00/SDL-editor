@@ -1,3 +1,4 @@
+-[BUG] if I select an changed edge at a new node then another one get selected too when a diagram is loaded so its probably giving them the same ID
 -decision different branching names with save/load 
 -text label anywhere on the canvas
 -decision with more than 2 branches dinamically
@@ -13,12 +14,15 @@
 -movement on the canvas
 -zoom in / zoom out       
 -long name breaks in nodes
+-save diagram as png
 -rule-based connection validation
 -better save JSON format for future interpreter
 -SDL interpreter
 
 DONE:
+2025.11.14:
 -editable node labels
+2025.11.15:
 -connection points only when selected/hover
 -edge select and delete
 -no text selection
@@ -26,4 +30,4 @@ DONE:
 -load button -> panel with saved diagrams
 -save naming without pop up default window
 -[BUG] termination, not proper connection edges in some cases (SOLVED by putting all 4 ports in the center, kinda lame)
--only one edge from one port except decision
+-only 2 edges from one node (in&out), except decision

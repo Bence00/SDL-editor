@@ -2,6 +2,7 @@
 
 -[BUG] while editing a label backspace shouldnt delete the node
 -load button -> panel with saved diagrams
+-edge select and delete
 -no text selection
 -easier connect
 -proper connection edges
@@ -17,3 +18,4 @@
 
 DONE:
 -editable node labels
+-connection points only when selected/hover

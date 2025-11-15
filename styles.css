@@ -1,4 +1,4 @@
-/* ---- Base layout ---- */
+/* ---- Layout ---- */
 
 html, body {
   margin: 0;
@@ -13,7 +13,7 @@ html, body {
   width: 100vw;
 }
 
-/* ---- Palette (sidebar) ---- */
+/* ---- Sidebar (palette) ---- */
 
 #palette {
   width: 240px;
@@ -131,14 +131,24 @@ html, body {
   cursor: se-resize;
 }
 
-/* Ports */
+/* Ports: hidden by default, visible on hover/selection */
 
 .port {
   fill: #fff;
-  stroke: #31d0c6;
+  stroke: #080808;
   stroke-width: 1;
   cursor: crosshair;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
 }
+
+.node:hover .port,
+.node.selected .port {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 
 /* Edges */
 
@@ -166,7 +176,11 @@ html, body {
   stroke-dasharray: 4 2;
   pointer-events: none;
 }
-#app, #app * {
+
+/* Disable text selection inside the app */
+
+#app,
+#app * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

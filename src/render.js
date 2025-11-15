@@ -144,46 +144,6 @@ function simpleManhattanRoute(from, to) {
   return points;
 }
 
-// These helpers are currently unused, but kept for potential
-// future, more advanced routing logic.
-
-function outwardPoint(p, side, offset) {
-  switch (side) {
-    case 'top':
-      return { x: p.x, y: p.y - offset };
-    case 'bottom':
-      return { x: p.x, y: p.y + offset };
-    case 'left':
-      return { x: p.x - offset, y: p.y };
-    case 'right':
-      return { x: p.x + offset, y: p.y };
-    default:
-      return { x: p.x, y: p.y };
-  }
-}
-
-function orthogonalBetween(a, b) {
-  const pts = [];
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-
-  if (dx === 0 || dy === 0) {
-    return pts;
-  }
-
-  if (Math.abs(dx) >= Math.abs(dy)) {
-    const midX = a.x + dx / 2;
-    pts.push({ x: midX, y: a.y });
-    pts.push({ x: midX, y: b.y });
-  } else {
-    const midY = a.y + dy / 2;
-    pts.push({ x: a.x, y: midY });
-    pts.push({ x: b.x, y: midY });
-  }
-
-  return pts;
-}
-
 /**
  * Render a single node group (<g>): body, label, ports, and resize handle.
  */
@@ -236,6 +196,13 @@ function renderNode(node) {
     port.setAttribute('cy', pos.y);
     port.setAttribute('r', 4);
     g.appendChild(port);
+  });
+
+  g.addEventListener('mouseenter', () => {
+    g.classList.add('hovered');
+  });
+  g.addEventListener('mouseleave', () => {
+      g.classList.remove('hovered');
   });
 
   svg.appendChild(g);

@@ -10,3 +10,8 @@ Start the built-in PHP development server:
 
 ```bash
 php -S localhost:8000
+```
+
+## Current State — 2025.11.15.
+
+![current state](/images/image.png)

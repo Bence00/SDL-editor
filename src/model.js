@@ -92,15 +92,25 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   const fromIdStr = String(fromNodeId);
   const toIdStr   = String(toNodeId);
 
-  // 0) Port-konfliktusok törlése:
-  //    - ugyanebből a (fromNodeId, fromPort) portból már megy ki él -> töröljük
-  //    - ugyanebbe a (toNodeId, toPort) portba már jön be él        -> töröljük
+  // fromNode típusa (döntjük el, hogy decision-e)
+  const fromNode = state.nodes.find(n => String(n.id) === fromIdStr);
+
   state.edges = state.edges.filter(e => {
-    const sameFrom =
-      String(e.fromNodeId) === fromIdStr && e.fromPort === fromPort;
-    const sameTo =
+    const sameToPort =
       String(e.toNodeId) === toIdStr && e.toPort === toPort;
-    return !sameFrom && !sameTo;
+
+    if (fromNode && fromNode.type !== 'decision') {
+      // 🔹 NEM decision node:
+      //    - ebből a node-ból SEMMILYEN portból nem maradhat másik outgoing edge
+      const sameFromNode = String(e.fromNodeId) === fromIdStr;
+      return !sameFromNode && !sameToPort;
+    } else {
+      // 🔹 Decision node:
+      //    - ugyanabból a portból (fromPort) csak 1 edge
+      const sameFromPort =
+        String(e.fromNodeId) === fromIdStr && e.fromPort === fromPort;
+      return !sameFromPort && !sameToPort;
+    }
   });
 
   // ha a kijelölt edge pont most törlődött, nullázzuk a kijelölést
@@ -120,8 +130,7 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
     fromPort,
     toNodeId: toIdStr,
     toPort,
-    // decision ág labelje (yes/no/cond stb.)
-    label: ''
+    label: ''   // decision ág label (yes/no/cond) ide kerül majd dblclicknél
   };
 
   state.edges.push(edge);

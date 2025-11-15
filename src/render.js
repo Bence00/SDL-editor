@@ -134,8 +134,6 @@ function renderEdges() {
   });
 }
 
-
-
 // Kis kilépés a node-ból, hogy ne a kereten csússzon a vonal
 function outwardPoint(p, side, offset) {
   switch (side) {

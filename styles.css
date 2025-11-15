@@ -1,4 +1,6 @@
-/* ---- Layout ---- */
+/* ============================================================
+   GLOBAL LAYOUT
+   ============================================================ */
 
 html, body {
   margin: 0;
@@ -13,7 +15,19 @@ html, body {
   width: 100vw;
 }
 
-/* ---- Sidebar (palette) ---- */
+/* Prevent accidental text selection everywhere */
+#app, #app * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+/* ============================================================
+   SIDEBAR / PALETTE
+   ============================================================ */
 
 #palette {
   width: 240px;
@@ -38,8 +52,8 @@ html, body {
   font-size: 13px;
 }
 
-/* Save / Load buttons */
 
+/* Buttons (Save/Load) */
 #palette button {
   display: inline-block;
   padding: 6px 10px;
@@ -60,8 +74,8 @@ html, body {
   transform: translateY(1px);
 }
 
-/* Palette item list */
 
+/* Palette item list */
 #paletteItems {
   margin-top: 4px;
   display: flex;
@@ -75,7 +89,6 @@ html, body {
   border: 1px solid #ccc;
   background: #fff;
   cursor: grab;
-  user-select: none;
   font-size: 13px;
 }
 
@@ -83,121 +96,12 @@ html, body {
   cursor: grabbing;
 }
 
-/* ---- Editor + Canvas ---- */
-
-#editor {
-  flex: 1;
-  position: relative;
-}
-
-/* SVG canvas */
-
-#canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  background: transparent; /* grid becomes visible */
-}
-
-/* Grid when enabled */
-
-#editor.grid-on {
-  background-image:
-    linear-gradient(to right, #d0d0d0 1px, transparent 1px),
-    linear-gradient(to bottom, #d0d0d0 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* ---- Nodes, ports, edges ---- */
-
-.node rect,
-.node ellipse,
-.node polygon {
-  cursor: move;
-  shape-rendering: geometricPrecision;
-}
-
-.node.selected rect,
-.node.selected ellipse,
-.node.selected polygon {
-  stroke: #007bff;
-  stroke-width: 2;
-}
-
-.resize-handle {
-  fill: #fff;
-  stroke: #007bff;
-  stroke-width: 1;
-  cursor: se-resize;
-}
-
-/* Ports: hidden by default, visible on hover/selection */
-
-.port {
-  fill: #fff;
-  stroke: #080808;
-  stroke-width: 1;
-  cursor: crosshair;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease-out;
-}
-
-.node:hover .port,
-.node.selected .port {
-  opacity: 1;
-  pointer-events: auto;
-}
 
 
-/* Edges */
+/* ============================================================
+   SAVE / LOAD BAR (Name input)
+   ============================================================ */
 
-.edge-line {
-  stroke: #444;
-  stroke-width: 1.5;
-  fill: none;
-  pointer-events: stroke; 
-}
-.edge-line.selected {
-  stroke: #007bff;        
-  stroke-width: 2;
-}
-.temp-edge-line {
-  stroke: #999;
-  stroke-width: 1.5;
-  fill: none;
-  pointer-events: none;
-}
-.edge-hit {
-  stroke: transparent;
-  stroke-width: 15;            /* itt állítod a hitbox vastagságát */
-  fill: none;
-  pointer-events: stroke;      /* ezen lehet kattintani */
-  cursor: pointer;
-}
-
-/* Selection rectangle (rubber band) */
-
-.selection-rect {
-  fill: rgba(0, 120, 215, 0.15);
-  stroke: #0078d7;
-  stroke-width: 1;
-  stroke-dasharray: 4 2;
-  pointer-events: none;
-}
-
-/* Disable text selection inside the app */
-
-#app,
-#app * {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-
-/* --- Save/load bar --- */
 #saveLoadBar {
   display: flex;
   flex-direction: column;
@@ -218,7 +122,143 @@ html, body {
   font-size: 13px;
 }
 
-/* --- Load panel overlay --- */
+
+
+/* ============================================================
+   EDITOR + CANVAS
+   ============================================================ */
+
+#editor {
+  flex: 1;
+  position: relative;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+}
+
+/* Grid lines when snap enabled */
+#editor.grid-on {
+  background-image:
+    linear-gradient(to right, #d0d0d0 1px, transparent 1px),
+    linear-gradient(to bottom, #d0d0d0 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+
+
+/* ============================================================
+   NODES
+   ============================================================ */
+
+/* Shapes */
+.node rect,
+.node ellipse,
+.node polygon {
+  cursor: move;
+  shape-rendering: geometricPrecision;
+}
+
+.node.selected rect,
+.node.selected ellipse,
+.node.selected polygon {
+  stroke: #007bff;
+  stroke-width: 2;
+}
+
+/* Resize handle */
+.resize-handle {
+  fill: #fff;
+  stroke: #007bff;
+  stroke-width: 1;
+  cursor: se-resize;
+}
+
+
+
+/* ============================================================
+   PORTS
+   ============================================================ */
+
+.port {
+  fill: #fff;
+  stroke: #080808;
+  stroke-width: 1;
+  cursor: crosshair;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+
+.node:hover .port,
+.node.selected .port {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
+/* ============================================================
+   EDGES
+   ============================================================ */
+
+.edge-line {
+  stroke: #444;
+  stroke-width: 1.5;
+  fill: none;
+  pointer-events: stroke;
+}
+
+.edge-line.selected {
+  stroke: #007bff;
+  stroke-width: 2;
+}
+
+/* Temporary preview edge */
+.temp-edge-line {
+  stroke: #999;
+  stroke-width: 1.5;
+  fill: none;
+  pointer-events: none;
+}
+
+/* Hitbox path (thick invisible stroke) */
+.edge-hit {
+  stroke: transparent;
+  stroke-width: 15;
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+/* Edge labels */
+.edge-label {
+  user-select: none;
+  pointer-events: auto;
+}
+
+
+
+/* ============================================================
+   SELECTION RECTANGLE
+   ============================================================ */
+
+.selection-rect {
+  fill: rgba(0, 120, 215, 0.15);
+  stroke: #0078d7;
+  stroke-width: 1;
+  stroke-dasharray: 4 2;
+  pointer-events: none;
+}
+
+
+
+/* ============================================================
+   LOAD PANEL OVERLAY
+   ============================================================ */
 
 .load-panel {
   position: fixed;
@@ -242,7 +282,7 @@ html, body {
   max-height: 60vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
 .load-panel-header {
@@ -277,13 +317,11 @@ html, body {
   background: #f3f3f3;
 }
 
-.edge-label {
-  pointer-events: none; 
-  user-select: none;
-  pointer-events: auto; 
-}
 
-/* ---- Quick Help (palette tutorial box) ---- */
+
+/* ============================================================
+   QUICK HELP BOX
+   ============================================================ */
 
 .quick-help {
   margin-top: 12px;
@@ -294,6 +332,4 @@ html, body {
   background: #f5f5f5;
   border: 1px solid #ddd;
   border-radius: 4px;
-  user-select: none;
 }
-

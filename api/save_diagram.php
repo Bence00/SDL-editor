@@ -1,5 +1,4 @@
 <?php
-// api/save_diagram.php
 
 // Allow JSON POST from same origin
 header('Content-Type: application/json; charset=utf-8');

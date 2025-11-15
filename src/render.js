@@ -1,6 +1,3 @@
-// render.js
-// Responsible for rendering the full SDL diagram to the main SVG element.
-
 import { SVG_NS } from './constants.js';
 import { svg } from './dom.js';
 import { state } from './state.js';
@@ -203,11 +200,14 @@ function renderNode(node) {
     g.classList.add('selected');
   }
 
-  // 1) Shape (type-specific)
+  // --- Double click on node → rename ---
+  
+
+  // 1) Shape (type-specific SVG body)
   const body = createBodyShape(node);
   g.appendChild(body);
 
-  // 2) Label (optional, type-specific)
+  // 2) Label (optional – some types hide labels)
   const text = getNodeLabel(node);
   if (text) {
     const label = document.createElementNS(SVG_NS, 'text');
@@ -217,6 +217,11 @@ function renderNode(node) {
     label.setAttribute('font-size', '13');
     label.setAttribute('fill', '#333');
     label.textContent = text;
+
+    // Keep class/dataset if you ever want label-specific logic
+    label.classList.add('node-label');
+    label.dataset.nodeId = node.id;
+
     g.appendChild(label);
   }
 
@@ -251,3 +256,4 @@ function renderNode(node) {
     g.appendChild(handle);
   }
 }
+

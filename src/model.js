@@ -1,7 +1,7 @@
 import { state, selectNode } from './state.js';
 
 export function createNode(type, x, y) {
-  const baseSize = { width: 140, height: 80 };
+  const baseSize = { width: 130, height: 70 };
 
   const node = {
     id: String(state.nextId++),
@@ -9,12 +9,14 @@ export function createNode(type, x, y) {
     x: x - baseSize.width / 2,
     y: y - baseSize.height / 2,
     width: baseSize.width,
-    height: baseSize.height
+    height: baseSize.height,
+    name: ''  // optional
   };
 
   state.nodes.push(node);
   selectNode(node.id);
 }
+
 
 export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   if (!fromNodeId || !toNodeId || !fromPort || !toPort) return;

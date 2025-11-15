@@ -1,9 +1,12 @@
 -proper connection edges
 -rule-based connection validation
--editable node labels
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
 -zoom in / zoom out
 -arrows only after...
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
+-while editing a label backspace shouldnt delete node
+
+DONE:
+-editable node labels

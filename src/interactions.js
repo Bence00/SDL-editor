@@ -9,6 +9,7 @@ import {
 import { render } from './render.js';
 import { clientToSvgPoint, snapPointToGrid } from './utils.js';
 import { SVG_NS } from './constants.js';
+import { getNodeLabel } from './nodeShapes.js';
 
 let selectionStart = null;
 let selectionRectEl = null;
@@ -19,6 +20,7 @@ export function initInteractions() {
   initCanvasDnD();
   initMouse();
   initKeyboard();
+  initLabelEditing();
 }
 
 /* ---------- PALETTE DRAG & DROP (CREATE NODES) ---------- */
@@ -44,14 +46,13 @@ function initCanvasDnD() {
     const pt = clientToSvgPoint(e.clientX, e.clientY);
 
     const pos = isSnapToGrid()
-      ? snapPointToGrid(pt.x, pt.y)   // gridhez igazítjuk
+      ? snapPointToGrid(pt.x, pt.y) // snap to grid if enabled
       : pt;
 
     createNode(type, pos.x, pos.y);
     render();
   });
 }
-
 
 /* ---------- MOUSE (DRAG / RESIZE / CONNECT / SELECT BOX) ---------- */
 
@@ -62,6 +63,10 @@ function initMouse() {
 }
 
 function onSvgMouseDown(e) {
+  // If this is the second click of a double click,
+  // do not start selection/drag/resizing. Let dblclick handle renaming.
+  if (e.detail === 2) return;
+
   // Empty canvas → start selection box
   if (e.target === svg) {
     const pt = clientToSvgPoint(e.clientX, e.clientY);
@@ -120,26 +125,26 @@ function onDocumentMouseMove(e) {
     selectionRectEl.setAttribute('height', h);
   }
 
-  // dragging nodes (multi)
-    if (state.dragging && state.dragging.nodes) {
+  // dragging nodes (multi-select)
+  if (state.dragging && state.dragging.nodes) {
     state.dragging.nodes.forEach(entry => {
-        const node = getNodeById(entry.id);
-        if (!node) return;
+      const node = getNodeById(entry.id);
+      if (!node) return;
 
-        let newX = pt.x - entry.offsetX;
-        let newY = pt.y - entry.offsetY;
+      let newX = pt.x - entry.offsetX;
+      let newY = pt.y - entry.offsetY;
 
-        if (isSnapToGrid()) {
+      if (isSnapToGrid()) {
         const snapped = snapPointToGrid(newX, newY);
         newX = snapped.x;
         newY = snapped.y;
-        }
+      }
 
-        node.x = newX;
-        node.y = newY;
+      node.x = newX;
+      node.y = newY;
     });
     render();
-}
+  }
 
   // resizing
   if (state.resizing) {
@@ -152,7 +157,7 @@ function onDocumentMouseMove(e) {
       let w = Math.max(40, startWidth + dx2);
       let h = Math.max(30, startHeight + dy2);
 
-      // (optional) snap resize
+      // optional: snap resize
       if (isSnapToGrid()) {
         const snapped = snapPointToGrid(w, h);
         w = snapped.x;
@@ -195,8 +200,10 @@ function onDocumentMouseUp(e) {
         const ny2 = node.y + node.height;
 
         const intersects =
-          nx1 < x2 && nx2 > x1 &&
-          ny1 < y2 && ny2 > y1;
+          nx1 < x2 &&
+          nx2 > x1 &&
+          ny1 < y2 &&
+          ny2 > y1;
 
         if (intersects) selectedIds.push(node.id);
       });
@@ -223,7 +230,7 @@ function onDocumentMouseUp(e) {
     let toNodeId = null;
     let toPort = null;
 
-    // 1) Először próbáljunk konkrét portot találni (régi logika)
+    // 1) try explicit port (old logic)
     let portEl =
       (e.target && e.target.closest && e.target.closest('.port')) || null;
     if (!portEl) {
@@ -232,11 +239,11 @@ function onDocumentMouseUp(e) {
     }
 
     if (portEl) {
-      // ha konkrét porton engedtük el, használjuk azt
+      // released over a specific port
       toNodeId = portEl.dataset.nodeId;
       toPort = portEl.dataset.port;
     } else {
-      // 2) NINCS port – nézzük meg, hogy egy node fölött vagyunk-e
+      // 2) no port → find closest side of node
       let nodeEl =
         (e.target && e.target.closest && e.target.closest('.node')) || null;
 
@@ -249,12 +256,11 @@ function onDocumentMouseUp(e) {
         toNodeId = nodeEl.dataset.id;
         const node = getNodeById(toNodeId);
         if (node) {
-          // kurzor pozíció SVG koordinátában
           const ptSvg = clientToSvgPoint(e.clientX, e.clientY);
 
-          const leftDist   = Math.abs(ptSvg.x - node.x);
-          const rightDist  = Math.abs(ptSvg.x - (node.x + node.width));
-          const topDist    = Math.abs(ptSvg.y - node.y);
+          const leftDist = Math.abs(ptSvg.x - node.x);
+          const rightDist = Math.abs(ptSvg.x - (node.x + node.width));
+          const topDist = Math.abs(ptSvg.y - node.y);
           const bottomDist = Math.abs(ptSvg.y - (node.y + node.height));
 
           const min = Math.min(leftDist, rightDist, topDist, bottomDist);
@@ -272,13 +278,11 @@ function onDocumentMouseUp(e) {
       }
     }
 
-    // Ha találtunk node-ot és portot, létrehozzuk az élt
     if (toNodeId && toPort) {
       createEdge(fromNodeId, fromPort, toNodeId, toPort);
       render();
     }
 
-    // ideiglenes vonal eltakarítása
     if (state.connecting.tempLine && state.connecting.tempLine.parentNode) {
       state.connecting.tempLine.parentNode.removeChild(
         state.connecting.tempLine
@@ -287,7 +291,6 @@ function onDocumentMouseUp(e) {
     state.connecting = null;
   }
 
-
   state.dragging = null;
   state.resizing = null;
 }
@@ -295,6 +298,9 @@ function onDocumentMouseUp(e) {
 /* ---------- HELPERS ---------- */
 
 function startDragging(e, nodeGroup) {
+  // don't start drag when this is part of a double click
+  if (e.detail === 2) return;
+
   e.stopPropagation();
   const clickedId = nodeGroup.dataset.id;
   const clickedNode = getNodeById(clickedId);
@@ -325,6 +331,9 @@ function startDragging(e, nodeGroup) {
 }
 
 function startResizing(e, handle) {
+  // don't start resize when this is part of a double click
+  if (e.detail === 2) return;
+
   e.stopPropagation();
   const nodeId = handle.dataset.nodeId;
   const node = getNodeById(nodeId);
@@ -341,6 +350,9 @@ function startResizing(e, handle) {
 }
 
 function startConnecting(e, port) {
+  // connecting via ports should only start on single click
+  if (e.detail === 2) return;
+
   e.stopPropagation();
   const nodeId = port.dataset.nodeId;
   const portName = port.dataset.port;
@@ -385,4 +397,89 @@ function initKeyboard() {
       e.preventDefault();
     }
   });
+}
+
+/* ---------- LABEL EDITING (DOUBLE CLICK) ---------- */
+function initLabelEditing() {
+  svg.addEventListener('dblclick', onSvgDoubleClick);
+}
+
+function onSvgDoubleClick(e) {
+  // Find nearest .node group
+  const nodeGroup = e.target.closest('.node');
+  if (!nodeGroup) {
+    return; // double-clicked empty canvas or edge
+  }
+
+  const nodeId = nodeGroup.dataset.id;
+  const node = getNodeById(nodeId);
+  if (!node) return;
+
+  // Nodes without label (e.g. start/stop) shouldn't be editable
+  const currentLabel = getNodeLabel(node);
+  if (!currentLabel) return;
+
+  // Compute center for positioning the HTML input overlay
+  const bbox = nodeGroup.getBBox();
+  const centerX = bbox.x + bbox.width / 2;
+  const centerY = bbox.y + bbox.height / 2;
+
+  // Convert SVG coordinates to client coordinates
+  const pt = svg.createSVGPoint();
+  pt.x = centerX;
+  pt.y = centerY;
+  const ctm = svg.getScreenCTM();
+  const screenPt = ctm ? pt.matrixTransform(ctm) : { x: centerX, y: centerY };
+
+  // Create an HTML <input> overlayed on top of the label
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentLabel;
+  input.style.position = 'fixed';
+  input.style.left = (screenPt.x - 60) + 'px';
+  input.style.top = (screenPt.y - 10) + 'px';
+  input.style.width = '120px';
+  input.style.fontSize = '13px';
+  input.style.padding = '2px 4px';
+  input.style.zIndex = '9999';
+  input.style.border = '1px solid #007bff';
+  input.style.borderRadius = '3px';
+  input.style.background = '#ffffff';
+
+  document.body.appendChild(input);
+  input.focus();
+  input.select();
+
+  function finishEdit(applyChange) {
+    if (applyChange) {
+      const trimmed = input.value.trim();
+      if (trimmed === '') {
+        // Empty → remove custom name, fall back to type
+        delete node.name;
+      } else {
+        // 🔥 THIS is the key line: write into state
+        node.name = trimmed;
+      }
+      render();
+    }
+
+    document.body.removeChild(input);
+    input.removeEventListener('blur', onBlur);
+    input.removeEventListener('keydown', onKeyDown);
+  }
+
+  function onBlur() {
+    finishEdit(true);
+  }
+
+  function onKeyDown(ev) {
+    if (ev.key === 'Enter') {
+      finishEdit(true);
+    } else if (ev.key === 'Escape') {
+      finishEdit(false);
+    }
+  }
+
+  input.addEventListener('blur', onBlur);
+  input.addEventListener('keydown', onKeyDown);
 }

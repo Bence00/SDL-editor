@@ -177,7 +177,7 @@ const OUTPUT_TYPE = {
 // START 
 const START_TYPE = {
   defaultSize: { ...DEFAULT_NODE_SIZE },
-  showLabel: false,
+  showLabel: true,
   computePorts: defaultPorts,
   createBody(node) {
     const body = document.createElementNS(SVG_NS, 'rect');
@@ -493,8 +493,15 @@ export function getNodeLabel(node) {
   if (desc.showLabel === false) {
     return null;
   }
-  if (typeof desc.getLabel === 'function') {
+   if (typeof node.name === 'string' && node.name.length > 0) {
+    return node.name;
+  }
+  if (typeof desc.getLabel === "function") {
     return desc.getLabel(node);
   }
   return capitalize(node.type);
 }
+
+
+
+

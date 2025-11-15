@@ -1,0 +1,88 @@
+{
+    "nodes": [
+        {
+            "id": "10",
+            "type": "start",
+            "x": 280,
+            "y": 20,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "11",
+            "type": "state",
+            "x": 440,
+            "y": 260,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "12",
+            "type": "output",
+            "x": 440,
+            "y": 400,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "13",
+            "type": "input",
+            "x": 440,
+            "y": 540,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "17",
+            "type": "start",
+            "x": 200,
+            "y": 220,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "18",
+            "type": "state",
+            "x": 180,
+            "y": 360,
+            "width": 130,
+            "height": 70,
+            "name": null
+        }
+    ],
+    "edges": [
+        {
+            "id": "e14",
+            "fromNodeId": "12",
+            "fromPort": "right",
+            "toNodeId": "13",
+            "toPort": "left"
+        },
+        {
+            "id": "e15",
+            "fromNodeId": "11",
+            "fromPort": "bottom",
+            "toNodeId": "12",
+            "toPort": "top"
+        },
+        {
+            "id": "e16",
+            "fromNodeId": "10",
+            "fromPort": "bottom",
+            "toNodeId": "11",
+            "toPort": "top"
+        },
+        {
+            "id": "e19",
+            "fromNodeId": "17",
+            "fromPort": "bottom",
+            "toNodeId": "12",
+            "toPort": "left"
+        }
+    ]
+}

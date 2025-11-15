@@ -17,10 +17,6 @@ php -S localhost:8000
 ![current state](/images/image.png)
 
 
-## Tutorial
+## Help
 
-**Delete nodes:**  
-Press **X**, **Backspace**, or **Delete** to remove the selected node(s).
-
-**Decision branch labels:**  
-Double-click an outgoing edge of a **Decision** node to edit its branch name (e.g. "yes", "no").
+**flow direction**: top → down

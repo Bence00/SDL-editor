@@ -1,87 +1,129 @@
-import { state, selectNode } from './state.js';
+// src/model.js
+import { state } from './state.js';
 
+/**
+ * Alap node-méretek típusonként.
+ * Ha mást akarsz, itt állítsd.
+ */
+const DEFAULT_NODE_SIZES = {
+  start:      { width: 130, height: 70 },
+  state:      { width: 130, height: 70 },
+  input:      { width: 130, height: 70 },
+  output:     { width: 130, height: 70 },
+  decision:   { width: 130, height: 70 },
+  createTask: { width: 130, height: 70 },
+  stop:       { width: 130, height: 70 },
+  default:    { width: 130, height: 70 }
+};
+
+/**
+ * Új node létrehozása.
+ * type: "start" | "state" | "input" | "output" | "decision" | "createTask" | "stop"
+ */
 export function createNode(type, x, y) {
-  const baseSize = { width: 130, height: 70 };
+  const size = DEFAULT_NODE_SIZES[type] || DEFAULT_NODE_SIZES.default;
+
+  const id = String(state.nextId++);
 
   const node = {
-    id: String(state.nextId++),
+    id,
     type,
-    x: x - baseSize.width / 2,
-    y: y - baseSize.height / 2,
-    width: baseSize.width,
-    height: baseSize.height,
-    name: ''  
+    x,
+    y,
+    width: size.width,
+    height: size.height,
+    // opcionális name, eleinte nincs
+    // name: undefined
   };
 
   state.nodes.push(node);
-  selectNode(node.id);
+  return node;
 }
 
-export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
-  if (!fromNodeId || !toNodeId || !fromPort || !toPort) return;
-  if (fromNodeId === toNodeId && fromPort === toPort) return;
-
-  if (
-    state.edges.some(
-      e =>
-        e.fromNodeId === fromNodeId &&
-        e.fromPort === fromPort &&
-        e.toNodeId === toNodeId &&
-        e.toPort === toPort
-    )
-  ) {
-    return;
-  }
-
-  state.edges.push({
-    id: 'e' + state.nextId++,
-    fromNodeId,
-    fromPort,
-    toNodeId,
-    toPort,
-  });
-}
-
+/**
+ * Node kikeresése id alapján.
+ */
 export function getNodeById(id) {
-  return state.nodes.find(n => n.id === id);
+  const sid = String(id);
+  return state.nodes.find(n => String(n.id) === sid) || null;
 }
 
-export function computePortPositions(node) {
-  return {
-    top: {
-      x: node.x + node.width / 2,
-      y: node.y
-    },
-    right: {
-      x: node.x + node.width,
-      y: node.y + node.height / 2
-    },
-    bottom: {
-      x: node.x + node.width / 2,
-      y: node.y + node.height
-    },
-    left: {
-      x: node.x,
-      y: node.y + node.height / 2
-    }
-  };
-}
-
+/**
+ * Node törlése + hozzá tartozó élek törlése.
+ */
 export function deleteNode(nodeId) {
-  const idx = state.nodes.findIndex(n => n.id === nodeId);
-  if (idx === -1) return false;
+  const sid = String(nodeId);
 
-  // remove node
-  state.nodes.splice(idx, 1);
+  // node kilövése
+  state.nodes = state.nodes.filter(n => String(n.id) !== sid);
 
-  // remove edges connected to this node
+  // hozzá kapcsolódó élek kilövése
+  const before = state.edges.length;
   state.edges = state.edges.filter(
-    e => e.fromNodeId !== nodeId && e.toNodeId !== nodeId
+    e => String(e.fromNodeId) !== sid && String(e.toNodeId) !== sid
   );
 
-  // clear selection if it pointed to this node
-  if (state.selectedNodeId === nodeId) {
+  // ha kijelölt edge is repült, selection reset
+  if (
+    state.selectedEdgeId &&
+    !state.edges.some(e => e.id === state.selectedEdgeId)
+  ) {
+    state.selectedEdgeId = null;
+  }
+
+  // ha kijelölt node ez volt, selection reset
+  if (state.selectedNodeId && String(state.selectedNodeId) === sid) {
     state.selectedNodeId = null;
   }
-  return true;
+  if (Array.isArray(state.selectedNodeIds)) {
+    state.selectedNodeIds = state.selectedNodeIds.filter(
+      nid => String(nid) !== sid
+    );
+  }
+}
+
+/**
+ * Új edge létrehozása.
+ * FONTOS: itt enforce-oljuk, hogy
+ *   - egy portból csak EGY edge menjen ki
+ *   - egy portba csak EGY edge jöjjön be
+ */
+export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
+  const fromIdStr = String(fromNodeId);
+  const toIdStr   = String(toNodeId);
+
+  // 0) Port-konfliktusok törlése:
+  //    - ugyanebből a (fromNodeId, fromPort) portból már megy ki él -> töröljük
+  //    - ugyanebbe a (toNodeId, toPort) portba már jön be él        -> töröljük
+  state.edges = state.edges.filter(e => {
+    const sameFrom =
+      String(e.fromNodeId) === fromIdStr && e.fromPort === fromPort;
+    const sameTo =
+      String(e.toNodeId) === toIdStr && e.toPort === toPort;
+    return !sameFrom && !sameTo;
+  });
+
+  // ha a kijelölt edge pont most törlődött, nullázzuk a kijelölést
+  if (
+    state.selectedEdgeId &&
+    !state.edges.some(e => e.id === state.selectedEdgeId)
+  ) {
+    state.selectedEdgeId = null;
+  }
+
+  // 1) Új edge id – ugyanaz a logika, mint a node-oknál: state.nextId++
+  const id = 'e' + state.nextId++;
+
+  const edge = {
+    id,
+    fromNodeId: fromIdStr,
+    fromPort,
+    toNodeId: toIdStr,
+    toPort,
+    // decision ág labelje (yes/no/cond stb.)
+    label: ''
+  };
+
+  state.edges.push(edge);
+  return edge;
 }

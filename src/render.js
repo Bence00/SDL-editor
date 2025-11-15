@@ -60,46 +60,19 @@ function renderEdges() {
     const toNode = getNodeById(edge.toNodeId);
     if (!fromNode || !toNode) return;
 
-    const fromCenter = {
-      x: fromNode.x + fromNode.width / 2,
-      y: fromNode.y + fromNode.height / 2
-    };
-    const toCenter = {
-      x: toNode.x + toNode.width / 2,
-      y: toNode.y + toNode.height / 2
-    };
-
-    const dx = toCenter.x - fromCenter.x;
-    const dy = toCenter.y - fromCenter.y;
-
-    let fromSide;
-    let toSide;
-
-    if (Math.abs(dy) > Math.abs(dx)) {
-      if (dy > 0) {
-        fromSide = 'bottom';
-        toSide = 'top';
-      } else {
-        fromSide = 'top';
-        toSide = 'bottom';
-      }
-    } else {
-      if (dx >= 0) {
-        fromSide = 'right';
-        toSide = 'left';
-      } else {
-        fromSide = 'left';
-        toSide = 'right';
-      }
-    }
-
     const fromPorts = computePortPositions(fromNode);
     const toPorts = computePortPositions(toNode);
+
+    // A TÉNYLEGESEN használt portok a state-ből jönnek
+    const fromSide = edge.fromPort || 'right';
+    const toSide = edge.toPort || 'left';
+
     const from = fromPorts[fromSide];
     const to = toPorts[toSide];
     if (!from || !to) return;
 
-    const points = simpleManhattanRoute(from, to);
+    const points = orthogonalRoute(fromNode, fromSide, toNode, toSide, from, to);
+
     const d = points
       .map((p, i) => (i === 0 ? 'M' : 'L') + ' ' + p.x + ' ' + p.y)
       .join(' ');
@@ -116,7 +89,7 @@ function renderEdges() {
     }
     svg.appendChild(path);
 
-    // Láthatatlan, vastag hitbox (ha használod)
+    // Láthatatlan, vastag hitbox
     const hitPath = document.createElementNS(SVG_NS, 'path');
     hitPath.setAttribute('d', d);
     hitPath.setAttribute('class', 'edge-hit');
@@ -129,23 +102,20 @@ function renderEdges() {
       edge.label &&
       edge.label.trim() !== ''
     ) {
-      // simpleManhattanRoute(...) már megvan, abból jön a points tömb
+      // edge eleje -> első szegmens közepe
       const p0 = points[0]; // port
       const p1 = points[1] || points[points.length - 1]; // első töréspont vagy cél
 
-      // pont a két pont között
       let labelX = (p0.x + p1.x) / 2;
       let labelY = (p0.y + p1.y) / 2;
-
       let anchor = 'middle';
 
-      // egy kicsit eltoljuk a vonaltól, hogy ne üljön pont rajta
       if (p0.y === p1.y) {
         // vízszintes szakasz
-        labelY -= 6;           // a vonal fölé
+        labelY -= 6;
       } else if (p0.x === p1.x) {
         // függőleges szakasz
-        labelX += 6;           // kicsit jobbra
+        labelX += 6;
         anchor = 'start';
       }
 
@@ -161,36 +131,61 @@ function renderEdges() {
 
       svg.appendChild(labelEl);
     }
-
   });
 }
 
 
 
-/**
- * Very simple Manhattan routing: from -> horizontal/vertical bend -> to.
- */
-function simpleManhattanRoute(from, to) {
+// Kis kilépés a node-ból, hogy ne a kereten csússzon a vonal
+function outwardPoint(p, side, offset) {
+  switch (side) {
+    case 'top':
+      return { x: p.x, y: p.y - offset };
+    case 'bottom':
+      return { x: p.x, y: p.y + offset };
+    case 'left':
+      return { x: p.x - offset, y: p.y };
+    case 'right':
+      return { x: p.x + offset, y: p.y };
+    default:
+      return { x: p.x, y: p.y };
+  }
+}
+
+function orthogonalRoute(fromNode, fromSide, toNode, toSide, from, to) {
+  const OFFSET = 15; // mennyire lógjon ki a nodeból az első/utolsó szegmens
+
   const points = [];
 
+  // 1) indulás a portból
   points.push({ x: from.x, y: from.y });
 
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
+  // 2) kifelé a source node-ból
+  const start = outwardPoint(from, fromSide, OFFSET);
 
-  // If almost aligned, just draw a straight line
-  if (Math.abs(dx) < 1 || Math.abs(dy) < 1) {
-    points.push({ x: to.x, y: to.y });
-    return points;
-  }
+  // 3) befelé a target node felé (de még előtte megállunk)
+  const end = outwardPoint(to, toSide, OFFSET);
 
-  // One bend in the "dominant" axis
-  if (Math.abs(dx) >= Math.abs(dy)) {
-    points.push({ x: to.x, y: from.y });
+  // ha nagyon közel vannak, engedjük meg az egyszerű L-t
+  if (Math.abs(start.x - end.x) < 1 || Math.abs(start.y - end.y) < 1) {
+    points.push(start);
+    points.push(end);
   } else {
-    points.push({ x: from.x, y: to.y });
+    points.push(start);
+
+    // köztes törés – egy sima "L" alak a szabad térben
+    if (fromSide === 'left' || fromSide === 'right') {
+      // vízszintesen indulunk → előbb végig abban az y-ban, aztán le/fel
+      points.push({ x: end.x, y: start.y });
+    } else {
+      // fentről/lentről indulunk → előbb végig abban az x-ben, aztán jobbra/balra
+      points.push({ x: start.x, y: end.y });
+    }
+
+    points.push(end);
   }
 
+  // 4) utolsó szegmens: from "end" pont → target port
   points.push({ x: to.x, y: to.y });
 
   return points;

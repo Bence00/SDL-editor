@@ -1,12 +1,19 @@
+(tasks in priority order)
+
+-[BUG] while editing a label backspace shouldnt delete the node
+-load button -> panel with saved diagrams
+-no text selection
+-easier connect
 -proper connection edges
 -rule-based connection validation
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
--zoom in / zoom out
+-zoom in / zoom out                  
 -arrows only after...
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
--while editing a label backspace shouldnt delete node
+-movement on the canvas
+-SDL interpreter
 
 DONE:
 -editable node labels

@@ -1,0 +1,184 @@
+{
+    "nodes": [
+        {
+            "id": "9",
+            "type": "start",
+            "x": 100,
+            "y": 100,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "10",
+            "type": "state",
+            "x": 100,
+            "y": 200,
+            "width": 130,
+            "height": 70,
+            "name": "IDLE"
+        },
+        {
+            "id": "12",
+            "type": "input",
+            "x": 100,
+            "y": 300,
+            "width": 130,
+            "height": 70,
+            "name": "start"
+        },
+        {
+            "id": "16",
+            "type": "output",
+            "x": 100,
+            "y": 400,
+            "width": 130,
+            "height": 70,
+            "name": "hello"
+        },
+        {
+            "id": "18",
+            "type": "state",
+            "x": 100,
+            "y": 500,
+            "width": 130,
+            "height": 70,
+            "name": "WAIT_ACK"
+        },
+        {
+            "id": "20",
+            "type": "start",
+            "x": 360,
+            "y": 100,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "22",
+            "type": "state",
+            "x": 360,
+            "y": 200,
+            "width": 130,
+            "height": 70,
+            "name": "IDLE"
+        },
+        {
+            "id": "26",
+            "type": "input",
+            "x": 360,
+            "y": 400,
+            "width": 130,
+            "height": 70,
+            "name": "hello"
+        },
+        {
+            "id": "28",
+            "type": "input",
+            "x": 100,
+            "y": 600,
+            "width": 130,
+            "height": 70,
+            "name": "ack"
+        },
+        {
+            "id": "30",
+            "type": "state",
+            "x": 100,
+            "y": 700,
+            "width": 130,
+            "height": 70,
+            "name": "CONNECTED"
+        },
+        {
+            "id": "34",
+            "type": "state",
+            "x": 360,
+            "y": 700,
+            "width": 130,
+            "height": 70,
+            "name": "CONNECTED"
+        },
+        {
+            "id": "37",
+            "type": "output",
+            "x": 360,
+            "y": 600,
+            "width": 130,
+            "height": 70,
+            "name": "ack"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e11",
+            "fromNodeId": "9",
+            "fromPort": "bottom",
+            "toNodeId": "10",
+            "toPort": "top"
+        },
+        {
+            "id": "e13",
+            "fromNodeId": "10",
+            "fromPort": "bottom",
+            "toNodeId": "12",
+            "toPort": "top"
+        },
+        {
+            "id": "e17",
+            "fromNodeId": "12",
+            "fromPort": "bottom",
+            "toNodeId": "16",
+            "toPort": "top"
+        },
+        {
+            "id": "e19",
+            "fromNodeId": "16",
+            "fromPort": "bottom",
+            "toNodeId": "18",
+            "toPort": "top"
+        },
+        {
+            "id": "e23",
+            "fromNodeId": "20",
+            "fromPort": "bottom",
+            "toNodeId": "22",
+            "toPort": "top"
+        },
+        {
+            "id": "e27",
+            "fromNodeId": "22",
+            "fromPort": "bottom",
+            "toNodeId": "26",
+            "toPort": "top"
+        },
+        {
+            "id": "e29",
+            "fromNodeId": "18",
+            "fromPort": "bottom",
+            "toNodeId": "28",
+            "toPort": "top"
+        },
+        {
+            "id": "e31",
+            "fromNodeId": "28",
+            "fromPort": "bottom",
+            "toNodeId": "30",
+            "toPort": "top"
+        },
+        {
+            "id": "e38",
+            "fromNodeId": "26",
+            "fromPort": "bottom",
+            "toNodeId": "37",
+            "toPort": "top"
+        },
+        {
+            "id": "e39",
+            "fromNodeId": "37",
+            "fromPort": "bottom",
+            "toNodeId": "34",
+            "toPort": "top"
+        }
+    ]
+}

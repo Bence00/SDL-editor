@@ -177,7 +177,7 @@ const OUTPUT_TYPE = {
 // START 
 const START_TYPE = {
   defaultSize: { ...DEFAULT_NODE_SIZE },
-  showLabel: true,
+  showLabel: false,
   computePorts: defaultPorts,
   createBody(node) {
     const body = document.createElementNS(SVG_NS, 'rect');

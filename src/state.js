@@ -13,6 +13,13 @@ export const state = {
 export function selectNode(id) {
   state.selectedNodeId = id;
   state.selectedNodeIds = id ? [id] : [];
+  state.selectedEdgeId = null;   
+}
+
+export function selectEdge(id) {
+  state.selectedEdgeId = id;
+  state.selectedNodeId = null;
+  state.selectedNodeIds = [];
 }
 
 export function setSnapToGrid(enabled) {

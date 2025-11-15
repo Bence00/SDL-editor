@@ -1,21 +1,24 @@
 (tasks in priority order)
 
--[BUG] while editing a label backspace shouldnt delete the node
 -load button -> panel with saved diagrams
--edge select and delete
--no text selection
+-save naming without pop up default window
+-ctrl selection
 -easier connect
 -proper connection edges
--rule-based connection validation
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
--zoom in / zoom out                  
 -arrows only after...
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
 -movement on the canvas
+-zoom in / zoom out       
+-rule-based connection validation
 -SDL interpreter
 
 DONE:
 -editable node labels
 -connection points only when selected/hover
+-edge select and delete
+-no text selection
+-[BUG] while editing a label backspace shouldnt delete the node
+

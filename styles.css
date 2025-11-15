@@ -156,15 +156,24 @@ html, body {
   stroke: #444;
   stroke-width: 1.5;
   fill: none;
-  pointer-events: none;
+  pointer-events: stroke; 
 }
-
+.edge-line.selected {
+  stroke: #007bff;        
+  stroke-width: 2;
+}
 .temp-edge-line {
   stroke: #999;
-  stroke-dasharray: 4 2;
-  stroke-width: 1.2;
+  stroke-width: 1.5;
   fill: none;
   pointer-events: none;
+}
+.edge-hit {
+  stroke: transparent;
+  stroke-width: 15;            /* itt állítod a hitbox vastagságát */
+  fill: none;
+  pointer-events: stroke;      /* ezen lehet kattintani */
+  cursor: pointer;
 }
 
 /* Selection rectangle (rubber band) */

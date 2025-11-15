@@ -75,9 +75,7 @@ function renderEdges() {
     let fromSide;
     let toSide;
 
-    // Choose the most "natural" side to connect based on centers
     if (Math.abs(dy) > Math.abs(dx)) {
-      // Mostly vertical
       if (dy > 0) {
         fromSide = 'bottom';
         toSide = 'top';
@@ -86,7 +84,6 @@ function renderEdges() {
         toSide = 'bottom';
       }
     } else {
-      // Mostly horizontal
       if (dx >= 0) {
         fromSide = 'right';
         toSide = 'left';
@@ -110,10 +107,24 @@ function renderEdges() {
     const path = document.createElementNS(SVG_NS, 'path');
     path.setAttribute('d', d);
     path.setAttribute('class', 'edge-line');
+    path.dataset.edgeId = edge.id;       
     path.setAttribute('marker-end', 'url(#arrowhead)');
+
+    if (state.selectedEdgeId === edge.id) {
+      path.classList.add('selected');
+    }
+
     svg.appendChild(path);
+    //hitbox
+    const hitPath = document.createElementNS(SVG_NS, 'path');
+    hitPath.setAttribute('d', d);
+    hitPath.setAttribute('class', 'edge-hit');
+    hitPath.dataset.edgeId = edge.id;
+
+    svg.appendChild(hitPath);
   });
 }
+
 
 /**
  * Very simple Manhattan routing: from -> horizontal/vertical bend -> to.

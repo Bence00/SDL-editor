@@ -1,5 +1,5 @@
 import { svg, palette } from './dom.js';
-import { state, selectNode, isSnapToGrid } from './state.js';
+import { state, selectNode, isSnapToGrid, selectEdge } from './state.js';
 import {
   createNode,
   createEdge,
@@ -67,13 +67,30 @@ function onSvgMouseDown(e) {
   // do not start selection/drag/resizing. Let dblclick handle renaming.
   if (e.detail === 2) return;
 
+  const target = e.target;
+
+  // 🔹 Edge click → select edge (vizuális vonal VAGY hitbox)
+  if (
+    target.classList &&
+    (target.classList.contains('edge-line') ||
+     target.classList.contains('edge-hit'))
+  ) {
+    const edgeId = target.dataset.edgeId;
+    if (edgeId != null) {
+      selectEdge(edgeId);
+      render();
+      return;
+    }
+  }
+
   // Empty canvas → start selection box
-  if (e.target === svg) {
+  if (target === svg) {
     const pt = clientToSvgPoint(e.clientX, e.clientY);
     selectionStart = pt;
 
     state.selectedNodeId = null;
     state.selectedNodeIds = [];
+    state.selectedEdgeId = null;
 
     if (!selectionRectEl) {
       selectionRectEl = document.createElementNS(SVG_NS, 'rect');
@@ -88,8 +105,6 @@ function onSvgMouseDown(e) {
     }
     return;
   }
-
-  const target = e.target;
 
   if (target.classList.contains('resize-handle')) {
     startResizing(e, target);
@@ -185,6 +200,8 @@ function onDocumentMouseUp(e) {
     const dx = pt.x - selectionStart.x;
     const dy = pt.y - selectionStart.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
+
+    state.selectedEdgeId = null; // 🔹 box select → edge deselect
 
     if (dist >= SELECTION_DRAG_THRESHOLD) {
       const x1 = Math.min(selectionStart.x, pt.x);
@@ -377,27 +394,60 @@ function startConnecting(e, port) {
 
 /* ---------- KEYBOARD (DELETE / BACKSPACE) ---------- */
 
+/* ---------- KEYBOARD (DELETE / BACKSPACE) ---------- */
+
 function initKeyboard() {
   document.addEventListener('keydown', e => {
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-      const ids =
-        state.selectedNodeIds && state.selectedNodeIds.length
-          ? Array.from(new Set(state.selectedNodeIds))
-          : state.selectedNodeId
-          ? [state.selectedNodeId]
-          : [];
-
-      if (ids.length) {
-        ids.forEach(id => deleteNode(id));
-        state.selectedNodeId = null;
-        state.selectedNodeIds = [];
-        render();
-      }
-
-      e.preventDefault();
+    // csak Delete / Backspace érdekel
+    if (e.key !== 'Delete' && e.key !== 'Backspace' && e.key !== 'x') {
+      return;
     }
+
+   
+    const active = document.activeElement;
+    if (
+      active &&
+      (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.isContentEditable
+      )
+    ) {
+      return;
+    }
+
+    // NODE delete 
+    const ids =
+      state.selectedNodeIds && state.selectedNodeIds.length
+        ? Array.from(new Set(state.selectedNodeIds))
+        : state.selectedNodeId
+        ? [state.selectedNodeId]
+        : [];
+
+    if (ids.length) {
+      ids.forEach(id => deleteNode(id));
+      state.selectedNodeId = null;
+      state.selectedNodeIds = [];
+      render();
+      e.preventDefault();
+      return;
+    }
+
+    //  EDGE delete
+    if (state.selectedEdgeId != null) {
+      state.edges = state.edges.filter(
+        edge => edge.id !== state.selectedEdgeId
+      );
+      state.selectedEdgeId = null;
+      render();
+      e.preventDefault();
+      return;
+    }
+
+    e.preventDefault();
   });
 }
+
 
 /* ---------- LABEL EDITING (DOUBLE CLICK) ---------- */
 function initLabelEditing() {
@@ -457,7 +507,6 @@ function onSvgDoubleClick(e) {
         // Empty → remove custom name, fall back to type
         delete node.name;
       } else {
-        // 🔥 THIS is the key line: write into state
         node.name = trimmed;
       }
       render();

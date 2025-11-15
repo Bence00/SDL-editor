@@ -195,3 +195,84 @@ html, body {
   -ms-user-select: none;
   user-select: none;
 }
+
+
+/* --- Save/load bar --- */
+#saveLoadBar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 2px;
+  color: #555;
+}
+
+#diagramNameInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  font-size: 13px;
+}
+
+/* --- Load panel overlay --- */
+
+.load-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+}
+
+.load-panel.hidden {
+  display: none;
+}
+
+.load-panel-inner {
+  background: #fff;
+  border-radius: 6px;
+  min-width: 260px;
+  max-width: 360px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.load-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.close-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.load-list {
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.load-list-item {
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.load-list-item:hover {
+  background: #f3f3f3;
+}

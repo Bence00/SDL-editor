@@ -22,15 +22,24 @@
         </label>
       </div>
 
-      <!-- Save / Load buttons -->
+      <!-- Save / Load name + buttons (NO prompt) -->
+      <div class="control-group">
+        <label for="diagramNameInput" class="field-label">Diagram name</label>
+        <input
+          id="diagramNameInput"
+          type="text"
+          placeholder="diagram name"
+          value="default"
+        />
+      </div>
+
       <div class="control-group">
         <button id="btnSave">💾 Save</button>
         <button id="btnLoad">📂 Load</button>
       </div>
 
       <!-- Component List -->
-        <div id="paletteItems">
-        <!-- Bal oszlop: Start, State, Input, Output, Plain C code -->
+      <div id="paletteItems">
         <div class="palette-group-title">Basic</div>
         <div class="palette-item" draggable="true" data-node-type="start">Start</div>
         <div class="palette-item" draggable="true" data-node-type="state">State</div>
@@ -39,8 +48,7 @@
         <div class="palette-item" draggable="true" data-node-type="decision">Decision</div>
         <div class="palette-item" draggable="true" data-node-type="createTask">Task</div>
         <div class="palette-item" draggable="true" data-node-type="stop">Termination</div>
-
-        </div>
+      </div>
 
     </aside>
 
@@ -49,6 +57,19 @@
       <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
     </main>
 
+  </div>
+
+  <!-- Load panel overlay -->
+  <div id="loadPanel" class="load-panel hidden">
+    <div class="load-panel-inner">
+      <div class="load-panel-header">
+        <span>Saved diagrams</span>
+        <button id="loadPanelClose" class="close-btn">✕</button>
+      </div>
+      <div id="loadList" class="load-list">
+        <!-- filled dynamically -->
+      </div>
+    </div>
   </div>
 
   <!-- Entry point -->

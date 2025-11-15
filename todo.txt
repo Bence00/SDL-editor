@@ -1,7 +1,5 @@
 (tasks in priority order)
 
--load button -> panel with saved diagrams
--save naming without pop up default window
 -ctrl selection
 -easier connect
 -proper connection edges
@@ -12,6 +10,7 @@
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
 -movement on the canvas
 -zoom in / zoom out       
+-long name breaks in nodes
 -rule-based connection validation
 -SDL interpreter
 
@@ -21,4 +20,5 @@ DONE:
 -edge select and delete
 -no text selection
 -[BUG] while editing a label backspace shouldnt delete the node
-
+-load button -> panel with saved diagrams
+-save/load naming without pop up default window

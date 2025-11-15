@@ -205,7 +205,7 @@ function renderNode(node) {
     port.dataset.port = name;
     port.setAttribute('cx', pos.x);
     port.setAttribute('cy', pos.y);
-    port.setAttribute('r', 4);
+    port.setAttribute('r', 4.5); //port radius
     g.appendChild(port);
   });
 

@@ -166,3 +166,9 @@ html, body {
   stroke-dasharray: 4 2;
   pointer-events: none;
 }
+#app, #app * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

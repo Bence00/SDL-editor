@@ -1,5 +1,6 @@
 (tasks in priority order)
 
+-decision different branching names with save/load 
 -reset to default size selected node(s)
 -ctrl selection
 -easier connect

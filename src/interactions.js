@@ -455,41 +455,135 @@ function initLabelEditing() {
 }
 
 function onSvgDoubleClick(e) {
-  // Find nearest .node group
+  // 1) Node címke szerkesztés (régi logika)
   const nodeGroup = e.target.closest('.node');
-  if (!nodeGroup) {
-    return; // double-clicked empty canvas or edge
+  if (nodeGroup) {
+    const nodeId = nodeGroup.dataset.id;
+    const node = getNodeById(nodeId);
+    if (!node) return;
+
+    const currentLabel = getNodeLabel(node);
+    if (!currentLabel) return;
+
+    const bbox = nodeGroup.getBBox();
+    const centerX = bbox.x + bbox.width / 2;
+    const centerY = bbox.y + bbox.height / 2;
+
+    const pt = svg.createSVGPoint();
+    pt.x = centerX;
+    pt.y = centerY;
+    const ctm = svg.getScreenCTM();
+    const screenPt = ctm ? pt.matrixTransform(ctm) : { x: centerX, y: centerY };
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentLabel;
+    input.style.position = 'fixed';
+    input.style.left = (screenPt.x - 60) + 'px';
+    input.style.top = (screenPt.y - 10) + 'px';
+    input.style.width = '120px';
+    input.style.fontSize = '13px';
+    input.style.padding = '2px 4px';
+    input.style.zIndex = '9999';
+    input.style.border = '1px solid #007bff';
+    input.style.borderRadius = '3px';
+    input.style.background = '#ffffff';
+
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+
+    let finishedNode = false;
+
+    function finishEditNode(applyChange) {
+      if (finishedNode) return;
+      finishedNode = true;
+
+      if (applyChange) {
+        const trimmed = input.value.trim();
+        if (trimmed === '') {
+          delete node.name;
+        } else {
+          node.name = trimmed;
+        }
+        render();
+      }
+
+      if (input.isConnected) {
+        input.removeEventListener('blur', onBlurNode);
+        input.removeEventListener('keydown', onKeyDownNode);
+        input.parentNode.removeChild(input);
+      }
+    }
+
+    function onBlurNode() {
+      finishEditNode(true);
+    }
+
+    function onKeyDownNode(ev) {
+      ev.stopPropagation();
+      if (ev.key === 'Enter') {
+        // ne fusson le még egyszer blur-ből úgy, hogy már lezártuk
+        ev.preventDefault();
+        finishEditNode(true);
+      } else if (ev.key === 'Escape') {
+        ev.preventDefault();
+        finishEditNode(false);
+      }
+    }
+
+    input.addEventListener('blur', onBlurNode);
+    input.addEventListener('keydown', onKeyDownNode);
+    return;
   }
 
-  const nodeId = nodeGroup.dataset.id;
-  const node = getNodeById(nodeId);
-  if (!node) return;
+  // 2) Edge label szerkesztés – csak decision-ből induló élekre (SDL-88)
 
-  // Nodes without label (e.g. start/stop) shouldn't be editable
-  const currentLabel = getNodeLabel(node);
-  if (!currentLabel) return;
+  const edgeEl =
+    e.target.closest('.edge-line') ||
+    e.target.closest('.edge-hit') ||
+    e.target.closest('.edge-label');
 
-  // Compute center for positioning the HTML input overlay
-  const bbox = nodeGroup.getBBox();
+  if (!edgeEl) {
+    return; // üres canvas vagy valami más
+  }
+
+  const edgeId = edgeEl.dataset.edgeId;
+  if (!edgeId) return;
+
+  const edge = state.edges.find(ed => String(ed.id) === String(edgeId));
+  if (!edge) return;
+
+  const fromNode = getNodeById(edge.fromNodeId);
+  if (!fromNode || fromNode.type !== 'decision') {
+    return;
+  }
+
+  const currentLabel = edge.label || '';
+
+  const visualEdgeEl = svg.querySelector(
+    `.edge-line[data-edge-id="${edgeId}"]`
+  );
+  if (!visualEdgeEl) return;
+
+  const bbox = visualEdgeEl.getBBox();
   const centerX = bbox.x + bbox.width / 2;
   const centerY = bbox.y + bbox.height / 2;
 
-  // Convert SVG coordinates to client coordinates
-  const pt = svg.createSVGPoint();
-  pt.x = centerX;
-  pt.y = centerY;
-  const ctm = svg.getScreenCTM();
-  const screenPt = ctm ? pt.matrixTransform(ctm) : { x: centerX, y: centerY };
+  const pt2 = svg.createSVGPoint();
+  pt2.x = centerX;
+  pt2.y = centerY;
+  const ctm2 = svg.getScreenCTM();
+  const screenPt2 = ctm2 ? pt2.matrixTransform(ctm2) : { x: centerX, y: centerY };
 
-  // Create an HTML <input> overlayed on top of the label
   const input = document.createElement('input');
   input.type = 'text';
   input.value = currentLabel;
   input.style.position = 'fixed';
-  input.style.left = (screenPt.x - 60) + 'px';
-  input.style.top = (screenPt.y - 10) + 'px';
+  input.style.left = (screenPt2.x - 60) + 'px';
+  input.style.top = (screenPt2.y - 10) + 'px';
   input.style.width = '120px';
-  input.style.fontSize = '13px';
+  input.style.fontSize = '11px';
   input.style.padding = '2px 4px';
   input.style.zIndex = '9999';
   input.style.border = '1px solid #007bff';
@@ -500,35 +594,40 @@ function onSvgDoubleClick(e) {
   input.focus();
   input.select();
 
-  function finishEdit(applyChange) {
+  let finishedEdge = false;
+
+  function finishEditEdge(applyChange) {
+    if (finishedEdge) return;
+    finishedEdge = true;
+
     if (applyChange) {
       const trimmed = input.value.trim();
-      if (trimmed === '') {
-        // Empty → remove custom name, fall back to type
-        delete node.name;
-      } else {
-        node.name = trimmed;
-      }
+      edge.label = trimmed;
       render();
     }
 
-    document.body.removeChild(input);
-    input.removeEventListener('blur', onBlur);
-    input.removeEventListener('keydown', onKeyDown);
-  }
-
-  function onBlur() {
-    finishEdit(true);
-  }
-
-  function onKeyDown(ev) {
-    if (ev.key === 'Enter') {
-      finishEdit(true);
-    } else if (ev.key === 'Escape') {
-      finishEdit(false);
+    if (input.isConnected) {
+      input.removeEventListener('blur', onBlurEdge);
+      input.removeEventListener('keydown', onKeyDownEdge);
+      input.parentNode.removeChild(input);
     }
   }
 
-  input.addEventListener('blur', onBlur);
-  input.addEventListener('keydown', onKeyDown);
+  function onBlurEdge() {
+    finishEditEdge(true);
+  }
+
+  function onKeyDownEdge(ev) {
+    ev.stopPropagation();
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      finishEditEdge(true);
+    } else if (ev.key === 'Escape') {
+      ev.preventDefault();
+      finishEditEdge(false);
+    }
+  }
+
+  input.addEventListener('blur', onBlurEdge);
+  input.addEventListener('keydown', onKeyDownEdge);
 }

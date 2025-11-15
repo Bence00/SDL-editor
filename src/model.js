@@ -10,13 +10,12 @@ export function createNode(type, x, y) {
     y: y - baseSize.height / 2,
     width: baseSize.width,
     height: baseSize.height,
-    name: ''  // optional
+    name: ''  
   };
 
   state.nodes.push(node);
   selectNode(node.id);
 }
-
 
 export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   if (!fromNodeId || !toNodeId || !fromPort || !toPort) return;
@@ -39,7 +38,7 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
     fromNodeId,
     fromPort,
     toNodeId,
-    toPort
+    toPort,
   });
 }
 

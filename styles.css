@@ -276,3 +276,24 @@ html, body {
 .load-list-item:hover {
   background: #f3f3f3;
 }
+
+.edge-label {
+  pointer-events: none; 
+  user-select: none;
+  pointer-events: auto; 
+}
+
+/* ---- Quick Help (palette tutorial box) ---- */
+
+.quick-help {
+  margin-top: 12px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #444;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  user-select: none;
+}
+

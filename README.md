@@ -15,3 +15,12 @@ php -S localhost:8000
 ## Current State — 2025.11.15.
 
 ![current state](/images/image.png)
+
+
+## Tutorial
+
+**Delete nodes:**  
+Press **X**, **Backspace**, or **Delete** to remove the selected node(s).
+
+**Decision branch labels:**  
+Double-click an outgoing edge of a **Decision** node to edit its branch name (e.g. "yes", "no").

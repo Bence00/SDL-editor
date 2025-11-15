@@ -104,26 +104,67 @@ function renderEdges() {
       .map((p, i) => (i === 0 ? 'M' : 'L') + ' ' + p.x + ' ' + p.y)
       .join(' ');
 
+    // Vizuális edge
     const path = document.createElementNS(SVG_NS, 'path');
     path.setAttribute('d', d);
     path.setAttribute('class', 'edge-line');
-    path.dataset.edgeId = edge.id;       
+    path.dataset.edgeId = edge.id;
     path.setAttribute('marker-end', 'url(#arrowhead)');
 
     if (state.selectedEdgeId === edge.id) {
       path.classList.add('selected');
     }
-
     svg.appendChild(path);
-    //hitbox
+
+    // Láthatatlan, vastag hitbox (ha használod)
     const hitPath = document.createElementNS(SVG_NS, 'path');
     hitPath.setAttribute('d', d);
     hitPath.setAttribute('class', 'edge-hit');
     hitPath.dataset.edgeId = edge.id;
-
     svg.appendChild(hitPath);
+
+    // --------- EDGE LABEL A DECISION-BŐL KIJÖVŐ ÁGRA ---------
+    if (
+      fromNode.type === 'decision' &&
+      edge.label &&
+      edge.label.trim() !== ''
+    ) {
+      // simpleManhattanRoute(...) már megvan, abból jön a points tömb
+      const p0 = points[0]; // port
+      const p1 = points[1] || points[points.length - 1]; // első töréspont vagy cél
+
+      // pont a két pont között
+      let labelX = (p0.x + p1.x) / 2;
+      let labelY = (p0.y + p1.y) / 2;
+
+      let anchor = 'middle';
+
+      // egy kicsit eltoljuk a vonaltól, hogy ne üljön pont rajta
+      if (p0.y === p1.y) {
+        // vízszintes szakasz
+        labelY -= 6;           // a vonal fölé
+      } else if (p0.x === p1.x) {
+        // függőleges szakasz
+        labelX += 6;           // kicsit jobbra
+        anchor = 'start';
+      }
+
+      const labelEl = document.createElementNS(SVG_NS, 'text');
+      labelEl.classList.add('edge-label');
+      labelEl.dataset.edgeId = edge.id;
+      labelEl.setAttribute('x', labelX);
+      labelEl.setAttribute('y', labelY);
+      labelEl.setAttribute('text-anchor', anchor);
+      labelEl.setAttribute('font-size', '11');
+      labelEl.setAttribute('fill', '#333');
+      labelEl.textContent = edge.label;
+
+      svg.appendChild(labelEl);
+    }
+
   });
 }
+
 
 
 /**

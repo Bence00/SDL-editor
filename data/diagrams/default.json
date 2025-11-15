@@ -1,0 +1,47 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "type": "decision",
+            "x": 100,
+            "y": 240,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "2",
+            "type": "input",
+            "x": -5,
+            "y": 385,
+            "width": 130,
+            "height": 70,
+            "name": null
+        },
+        {
+            "id": "4",
+            "type": "decision",
+            "x": 180,
+            "y": 380,
+            "width": 130,
+            "height": 70,
+            "name": null
+        }
+    ],
+    "edges": [
+        {
+            "id": "e3",
+            "fromNodeId": "1",
+            "fromPort": "bottom",
+            "toNodeId": "2",
+            "toPort": "top"
+        },
+        {
+            "id": "e5",
+            "fromNodeId": "1",
+            "fromPort": "bottom",
+            "toNodeId": "4",
+            "toPort": "top"
+        }
+    ]
+}

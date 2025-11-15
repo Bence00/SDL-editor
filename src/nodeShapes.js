@@ -195,7 +195,7 @@ const START_TYPE = {
 };
 // STOP/TERMINATE
 const STOP_TYPE = {
-  defaultSize: { width: 40, height: 40 },
+  defaultSize: { ...DEFAULT_NODE_SIZE },
   showLabel: false,
 
   computePorts: manualPorts({
@@ -211,7 +211,7 @@ const STOP_TYPE = {
     const cx = node.x + node.width / 2;
     const cy = node.y + node.height / 2;
 
-    const scale = 0.6;
+    const scale = 1;
     const size = Math.min(node.width, node.height) * scale;
     const half = size / 2;
     const strokeWidth = 2;

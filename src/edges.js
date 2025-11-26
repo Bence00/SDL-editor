@@ -60,7 +60,7 @@ export function drawSingleEdge(edge) {
   const hit = document.createElementNS(SVG_NS, "path");
   hit.setAttribute("d", d);
   hit.setAttribute("class", "edge-hit");
-  hit.dataset.edgeId = edge.id;     // IMPORTANT
+  hit.dataset.edgeId = edge.id;     
 
   g.appendChild(hit);
 

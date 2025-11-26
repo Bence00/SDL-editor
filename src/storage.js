@@ -1,80 +1,66 @@
-import { state } from './state.js';
-import { render } from './render.js';
+// src/storage.js
+import { state } from "./state.js";
+import { render } from "./render.js";
+import { extractProcesses } from "./processExtractor.js";
 
+/**
+ * EXPORT — full SDL multi-process diagram
+ */
 export function exportDiagram() {
   return {
-    nodes: state.nodes.map(function (n) {
-      return {
-        id: n.id ?? null,
-        type: n.type ?? null,
-        x: typeof n.x === 'number' ? n.x : 0,
-        y: typeof n.y === 'number' ? n.y : 0,
-        width: typeof n.width === 'number' ? n.width : 120,
-        height: typeof n.height === 'number' ? n.height : 60,
-        name:
-          typeof n.name === 'string' && n.name.trim().length > 0
-            ? n.name.trim()
-            : null
-      };
-    }),
-
-    edges: state.edges.map(function (e) {
-      return {
-        id: e.id ?? null,
-        fromNodeId: e.fromNodeId ?? null,
-        fromPort:
-          typeof e.fromPort === 'string' && e.fromPort.length > 0
-            ? e.fromPort
-            : null,
-        toNodeId: e.toNodeId ?? null,
-        toPort:
-          typeof e.toPort === 'string' && e.toPort.length > 0
-            ? e.toPort
-            : null
-      };
-    })
+    processes: extractProcesses(),
+    nodes: state.nodes.map(n => ({
+      id: n.id,
+      type: n.type,
+      x: n.x,
+      y: n.y,
+      width: n.width,
+      height: n.height,
+      name: n.name || null
+    })),
+    edges: state.edges.map(e => ({
+      id: e.id,
+      fromNodeId: e.fromNodeId,
+      fromPort: e.fromPort || null,
+      toNodeId: e.toNodeId,
+      toPort: e.toPort || null,
+      label: e.label || ""
+    }))
   };
 }
 
+/**
+ * IMPORT — restores nodes + edges + positions + labels
+ */
 export function importDiagram(diagram) {
   if (!diagram || !Array.isArray(diagram.nodes) || !Array.isArray(diagram.edges)) {
-    console.error('importDiagram: invalid diagram object', diagram);
+    console.error("Invalid diagram format", diagram);
     return;
   }
 
-  state.nodes = diagram.nodes.map(function (n) {
-    return {
-      id: n.id,
-      type: n.type,
-      x: typeof n.x === 'number' ? n.x : 0,
-      y: typeof n.y === 'number' ? n.y : 0,
-      width: typeof n.width === 'number' ? n.width : 120,
-      height: typeof n.height === 'number' ? n.height : 60,
-      name:
-        typeof n.name === 'string' && n.name.trim().length > 0
-          ? n.name.trim()
-          : undefined
-    };
-  });
+  state.nodes = diagram.nodes.map(n => ({
+    id: n.id,
+    type: n.type,
+    x: n.x,
+    y: n.y,
+    width: n.width,
+    height: n.height,
+    name: n.name || undefined
+  }));
 
-  state.edges = diagram.edges.map(function (e) {
-    return {
-      id: e.id,
-      fromNodeId: e.fromNodeId ?? null,
-      fromPort:
-        typeof e.fromPort === 'string' && e.fromPort.length > 0
-          ? e.fromPort
-          : null,
-      toNodeId: e.toNodeId ?? null,
-      toPort:
-        typeof e.toPort === 'string' && e.toPort.length > 0
-          ? e.toPort
-          : null
-    };
-  });
+  state.edges = diagram.edges.map(e => ({
+    id: e.id,
+    fromNodeId: e.fromNodeId,
+    fromPort: e.fromPort,
+    toNodeId: e.toNodeId,
+    toPort: e.toPort,
+    label: e.label || ""
+  }));
 
+  // Reset selections
   state.selectedNodeId = null;
   state.selectedNodeIds = [];
+  state.selectedEdgeId = null;
 
   render();
 }

@@ -1,4 +1,102 @@
 {
+    "processes": {
+        "9": {
+            "id": "9",
+            "name": "PROCESS_9",
+            "start": {
+                "nodeId": "9",
+                "name": "START",
+                "x": 100,
+                "y": 100,
+                "width": 130,
+                "height": 70,
+                "transition": [
+                    {
+                        "nextstate": "10"
+                    }
+                ],
+                "newstate": "10"
+            },
+            "states": {
+                "10": {
+                    "nodeId": "10",
+                    "name": "IDLE",
+                    "x": 120,
+                    "y": 200,
+                    "width": 130,
+                    "height": 70,
+                    "transitions": [
+                        {
+                            "nextstate": "22"
+                        }
+                    ]
+                },
+                "22": {
+                    "nodeId": "22",
+                    "name": "IDLE",
+                    "x": 360,
+                    "y": 200,
+                    "width": 130,
+                    "height": 70,
+                    "transitions": [
+                        {
+                            "nextstate": "26"
+                        }
+                    ]
+                },
+                "26": {
+                    "nodeId": "26",
+                    "name": "hello",
+                    "x": 360,
+                    "y": 400,
+                    "width": 130,
+                    "height": 70,
+                    "transitions": [
+                        {
+                            "nextstate": "37"
+                        }
+                    ]
+                },
+                "34": {
+                    "nodeId": "34",
+                    "name": "CONNECTED",
+                    "x": 360,
+                    "y": 700,
+                    "width": 130,
+                    "height": 70,
+                    "transitions": []
+                },
+                "37": {
+                    "nodeId": "37",
+                    "name": "ack",
+                    "x": 360,
+                    "y": 600,
+                    "width": 130,
+                    "height": 70,
+                    "transitions": [
+                        {
+                            "nextstate": "34"
+                        }
+                    ]
+                }
+            }
+        },
+        "20": {
+            "id": "20",
+            "name": "PROCESS_20",
+            "start": {
+                "nodeId": "20",
+                "name": "START",
+                "x": 360,
+                "y": 100,
+                "width": 130,
+                "height": 70,
+                "transition": [],
+                "newstate": null
+            },
+            "states": []
+        }
+    },
     "nodes": [
         {
             "id": "9",
@@ -12,7 +110,7 @@
         {
             "id": "10",
             "type": "state",
-            "x": 100,
+            "x": 120,
             "y": 200,
             "width": 130,
             "height": 70,
@@ -115,70 +213,48 @@
             "fromNodeId": "9",
             "fromPort": "bottom",
             "toNodeId": "10",
-            "toPort": "top"
-        },
-        {
-            "id": "e13",
-            "fromNodeId": "10",
-            "fromPort": "bottom",
-            "toNodeId": "12",
-            "toPort": "top"
-        },
-        {
-            "id": "e17",
-            "fromNodeId": "12",
-            "fromPort": "bottom",
-            "toNodeId": "16",
-            "toPort": "top"
-        },
-        {
-            "id": "e19",
-            "fromNodeId": "16",
-            "fromPort": "bottom",
-            "toNodeId": "18",
-            "toPort": "top"
-        },
-        {
-            "id": "e23",
-            "fromNodeId": "20",
-            "fromPort": "bottom",
-            "toNodeId": "22",
-            "toPort": "top"
+            "toPort": "top",
+            "label": ""
         },
         {
             "id": "e27",
             "fromNodeId": "22",
             "fromPort": "bottom",
             "toNodeId": "26",
-            "toPort": "top"
-        },
-        {
-            "id": "e29",
-            "fromNodeId": "18",
-            "fromPort": "bottom",
-            "toNodeId": "28",
-            "toPort": "top"
+            "toPort": "top",
+            "label": ""
         },
         {
             "id": "e31",
             "fromNodeId": "28",
             "fromPort": "bottom",
             "toNodeId": "30",
-            "toPort": "top"
-        },
-        {
-            "id": "e38",
-            "fromNodeId": "26",
-            "fromPort": "bottom",
-            "toNodeId": "37",
-            "toPort": "top"
+            "toPort": "top",
+            "label": ""
         },
         {
             "id": "e39",
             "fromNodeId": "37",
             "fromPort": "bottom",
             "toNodeId": "34",
-            "toPort": "top"
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e10",
+            "fromNodeId": "26",
+            "fromPort": "bottom",
+            "toNodeId": "37",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e2",
+            "fromNodeId": "10",
+            "fromPort": "right",
+            "toNodeId": "22",
+            "toPort": "left",
+            "label": ""
         }
     ]
 }

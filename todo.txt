@@ -1,14 +1,8 @@
--interactions.js into different files, render only rendering, model only data
--[BUG] if I select a changed edge at a new node then another one get selected too when a diagram is loaded so its probably giving them the same ID
 -decision different branching names with save/load 
 -text label anywhere on the canvas
 -decision with more than 2 branches dinamically
 -reset to default size selected node(s)
-!clear
--no selfconnection edges
 -ctrl selection
--easier connect
--proper connection edges
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
@@ -19,6 +13,8 @@
 -long name breaks in nodes
 -save diagram as png
 -rule-based connection validation
+
+-multi process mode
 -better save JSON format for future interpreter
 -SDL interpreter
 
@@ -34,3 +30,7 @@ DONE:
 -save naming without pop up default window
 -[BUG] termination, not proper connection edges in some cases (SOLVED by putting all 4 ports in the center, kinda lame)
 -only 2 edges from one node (in&out), except decision
+2025.11.26
+-clear button
+-proper connection edges (simplified)
+-unique IDs after loading previous diagrams

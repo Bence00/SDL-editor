@@ -9,7 +9,7 @@ import { capitalize } from './utils.js';
 // 1) DEFAULTS
 // -----------------------------------------------------------------------------
 
-const DEFAULT_NODE_SIZE = { width: 120, height: 60 };
+const DEFAULT_NODE_SIZE = { width: 140, height: 80 };
 
 // centrally styled SVG defaults
 const DEFAULT_FILL = "#ffffff";
@@ -32,8 +32,7 @@ const SHAPES = {
   sideEllipseCapsule(node) {
     const { x, y, width: w, height: h } = node;
 
-    // Ellipszis paraméter
-    const rx = w * 0.08; // mennyire legyen lapos az ív (állítható!)
+    const rx = w * 0.08; //arc
     const ry = h / 2;
 
     const cxLeft = x + rx;
@@ -387,7 +386,7 @@ export const NODE_TYPES = {
   start: {
     shape: "startOval",
     ports: "default",
-    showLabel: false
+    showLabel: true
   },
 
   state: {

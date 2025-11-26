@@ -1,19 +1,36 @@
-// src/main.js
+// ============================================================
+// main.js – SDL Editor Entry Point
+// ============================================================
+
 import { render } from './render.js';
 import { initInteractions } from './interactions.js';
 import { snapCheckbox, editorEl, btnSave, btnLoad } from './dom.js';
-import { setSnapToGrid } from './state.js';
+import { setSnapToGrid, state } from './state.js';
 import { exportDiagram, importDiagram } from './storage.js';
 
-// ---- INIT ----
+// Lazy DOM fetch (not imported)
+const diagramNameInput = document.getElementById('diagramNameInput');
+const loadPanel = document.getElementById('loadPanel');
+const loadList = document.getElementById('loadList');
+const loadPanelClose = document.getElementById('loadPanelClose');
+
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
 render();
 initInteractions();
 
-// ---- GRID HANDLING ----
 
-function applyGridVisual() {
+// ============================================================
+// GRID HANDLING (snap + visual grid)
+// ============================================================
+
+function updateGridVisual() {
   if (!editorEl) return;
-  if (snapCheckbox && snapCheckbox.checked) {
+
+  if (snapCheckbox?.checked) {
     editorEl.classList.add('grid-on');
   } else {
     editorEl.classList.remove('grid-on');
@@ -21,109 +38,114 @@ function applyGridVisual() {
 }
 
 if (snapCheckbox) {
+  // initial state
   setSnapToGrid(snapCheckbox.checked);
-  applyGridVisual();
+  updateGridVisual();
 
+  // user toggles snap-to-grid
   snapCheckbox.addEventListener('change', () => {
     setSnapToGrid(snapCheckbox.checked);
-    applyGridVisual();
-    render(); // marad, ez eddig is így volt
+    updateGridVisual();
+    render();
   });
 }
 
-// ---- EXTRA DOM ELEMENTS (NINCS IMPORT, BIZTONSÁGOS) ----
 
-const diagramNameInput = document.getElementById('diagramNameInput');
-const loadPanel = document.getElementById('loadPanel');
-const loadList = document.getElementById('loadList');
-const loadPanelClose = document.getElementById('loadPanelClose');
+// ============================================================
+// UTIL – Get current diagram name
+// ============================================================
 
 function getCurrentDiagramName() {
-  if (!diagramNameInput) return 'default';
-  const value = diagramNameInput.value.trim();
-  return value || 'default';
+  const name = diagramNameInput?.value.trim();
+  return name || "default";
 }
 
-// ---- SAVE / LOAD API ----
+
+// ============================================================
+// SAVE / LOAD API CALLS
+// ============================================================
 
 async function saveDiagram(name = 'default') {
-  const diagram = exportDiagram();
+  const payload = exportDiagram();
 
   const res = await fetch(
     `api/save_diagram.php?name=${encodeURIComponent(name)}`,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(diagram)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     }
   );
 
   const data = await res.json().catch(() => null);
-  if (!res.ok || !data || !data.ok) {
-    console.error('Save failed', res.status, data);
+
+  if (!res.ok || !data?.ok) {
+    console.error('Save failed:', res.status, data);
     alert('Save failed.');
     return;
   }
-  console.log('Saved diagram as', data.file || name);
+
+  console.log('Diagram saved as:', data.file || name);
 }
 
 async function loadDiagram(name = 'default') {
   const res = await fetch(
     `api/load_diagram.php?name=${encodeURIComponent(name)}`,
-    {
-      method: 'GET'
-    }
+    { method: 'GET' }
   );
 
   const data = await res.json().catch(() => null);
-  if (!res.ok || !data || !data.ok) {
-    console.error('Load failed', res.status, data);
-    alert('Load failed: ' + (data && data.error ? data.error : 'unknown error'));
+
+  if (!res.ok || !data?.ok) {
+    console.error('Load failed:', res.status, data);
+    alert('Load failed: ' + (data?.error || 'unknown error'));
     return;
   }
 
   importDiagram(data.diagram);
 }
 
-// ---- LOAD LIST (PANELHEZ) ----
-// api/list_diagrams.php -> { ok: true, names: ["default", ...] }
+
+// ============================================================
+// LOAD PANEL – Fetch saved diagrams
+// ============================================================
 
 async function fetchDiagramList() {
   try {
-    const res = await fetch('api/list_diagrams.php', { method: 'GET' });
+    const res = await fetch('api/list_diagrams.php');
     const data = await res.json().catch(() => null);
 
-    if (!res.ok || !data || !data.ok || !Array.isArray(data.names)) {
-      console.error('List diagrams failed', res.status, data);
+    if (!res.ok || !data?.ok || !Array.isArray(data.names)) {
+      console.error('Diagram list fetch failed:', res.status, data);
       return [];
     }
+
     return data.names;
   } catch (err) {
-    console.error('List diagrams error', err);
+    console.error('Diagram list error:', err);
     return [];
   }
 }
 
-// ---- LOAD PANEL UI ----
+
+// ============================================================
+// LOAD PANEL – UI logic
+// ============================================================
 
 function showLoadPanel() {
-  if (!loadPanel) return;
-  loadPanel.classList.remove('hidden');
+  loadPanel?.classList.remove('hidden');
 }
 
 function hideLoadPanel() {
-  if (!loadPanel) return;
-  loadPanel.classList.add('hidden');
+  loadPanel?.classList.add('hidden');
 }
 
 async function populateLoadPanel() {
   if (!loadList) return;
 
   loadList.innerHTML = 'Loading...';
-
   const names = await fetchDiagramList();
+
   if (!names.length) {
     loadList.innerHTML =
       '<div class="load-list-item">No saved diagrams.</div>';
@@ -131,58 +153,71 @@ async function populateLoadPanel() {
   }
 
   loadList.innerHTML = '';
+
   names.forEach(name => {
     const item = document.createElement('div');
     item.className = 'load-list-item';
     item.textContent = name;
+
     item.addEventListener('click', () => {
       loadDiagram(name);
       hideLoadPanel();
-      if (diagramNameInput) {
-        diagramNameInput.value = name;
-      }
+      if (diagramNameInput) diagramNameInput.value = name;
     });
+
     loadList.appendChild(item);
   });
 }
 
-// ---- BUTTON HANDLERS ----
 
-// SAVE 
-if (btnSave) {
-  btnSave.addEventListener('click', () => {
-    const name = getCurrentDiagramName();
-    saveDiagram(name);
-  });
-}
+// ============================================================
+// BUTTON EVENT HANDLERS
+// ============================================================
 
-// LOAD 
-if (btnLoad) {
-  btnLoad.addEventListener('click', async () => {
-    if (!loadPanel || !loadList) {
-      const fallbackName =
-        window.prompt('Diagram name to load:', getCurrentDiagramName()) ||
-        getCurrentDiagramName();
-      loadDiagram(fallbackName);
-      return;
-    }
+// ---- Save button
+btnSave?.addEventListener('click', () => {
+  saveDiagram(getCurrentDiagramName());
+});
 
-    await populateLoadPanel();
-    showLoadPanel();
-  });
-}
+// ---- Load button
+btnLoad?.addEventListener('click', async () => {
+  if (!loadPanel || !loadList) {
+    // fallback to classic prompt-based load
+    const name =
+      window.prompt("Diagram name to load:", getCurrentDiagramName()) ||
+      getCurrentDiagramName();
+    loadDiagram(name);
+    return;
+  }
 
-// PANEL CLOSE
-if (loadPanelClose) {
-  loadPanelClose.addEventListener('click', () => {
-    hideLoadPanel();
-  });
-}
+  await populateLoadPanel();
+  showLoadPanel();
+});
 
-if (loadPanel) {
-  loadPanel.addEventListener('click', e => {
-    if (e.target === loadPanel) {
-      hideLoadPanel();
-    }
-  });
-}
+// ---- Load panel closing (X button)
+loadPanelClose?.addEventListener('click', hideLoadPanel);
+
+// ---- Click outside the panel to close
+loadPanel?.addEventListener('click', (e) => {
+  if (e.target === loadPanel) hideLoadPanel();
+});
+
+
+// ============================================================
+// CLEAR DIAGRAM
+// ============================================================
+
+document.getElementById('btnClear')?.addEventListener('click', () => {
+  // Reset all state
+  state.nodes = [];
+  state.edges = [];
+  state.selectedNodeId = null;
+  state.selectedNodeIds = [];
+  state.selectedEdgeId = null;
+
+  state.dragging = null;
+  state.resizing = null;
+  state.connecting = null;
+
+  render();
+});

@@ -394,8 +394,6 @@ function startConnecting(e, port) {
 
 /* ---------- KEYBOARD (DELETE / BACKSPACE) ---------- */
 
-/* ---------- KEYBOARD (DELETE / BACKSPACE) ---------- */
-
 function initKeyboard() {
   document.addEventListener('keydown', e => {
     // csak Delete / Backspace érdekel

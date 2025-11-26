@@ -93,3 +93,10 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   state.edges.push(edge);
   return edge;
 }
+// melyik edge csatlakozik erre a portra?
+export function getEdgeAttachedTo(nodeId, portName) {
+  return state.edges.find(e =>
+    (e.fromNodeId === nodeId && e.fromPort === portName) ||
+    (e.toNodeId === nodeId && e.toPort === portName)
+  ) || null;
+}

@@ -48,9 +48,9 @@ export function render() {
   clearSvg();
   ensureDefs();
 
-  drawAllEdges(svg);  // <-- Only this
-
   state.nodes.forEach(renderNode);
+  
+  drawAllEdges(svg);  
 }
 
 // ======================================================

@@ -1,15 +1,18 @@
--[BUG] if I select an changed edge at a new node then another one get selected too when a diagram is loaded so its probably giving them the same ID
+-interactions.js into different files, render only rendering, model only data
+-[BUG] if I select a changed edge at a new node then another one get selected too when a diagram is loaded so its probably giving them the same ID
 -decision different branching names with save/load 
 -text label anywhere on the canvas
 -decision with more than 2 branches dinamically
 -reset to default size selected node(s)
+!clear
+-no selfconnection edges
 -ctrl selection
 -easier connect
 -proper connection edges
 -undo/redo (Ctrl+Z / Ctrl+Y)
 -resize handles for selected nodes
 -settings panel
--arrows only after...(protocol)
+!arrows only after...(protocol)
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
 -movement on the canvas
 -zoom in / zoom out       

@@ -162,6 +162,7 @@ html, body {
   shape-rendering: geometricPrecision;
 }
 
+.node.selected path,
 .node.selected rect,
 .node.selected ellipse,
 .node.selected polygon {

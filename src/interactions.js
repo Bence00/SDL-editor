@@ -1,5 +1,5 @@
 import { svg, palette } from './dom.js';
-import { state, selectNode, isSnapToGrid, selectEdge } from './state.js';
+import { state, selectNode, isSnapToGrid, selectEdge, undo, redo, saveStateForUndo } from './state.js';
 import {
   createNode,
   createEdge,
@@ -56,7 +56,7 @@ function initCanvasDnD() {
     const pos = isSnapToGrid()
       ? snapPointToGrid(pt.x, pt.y) // snap to grid if enabled
       : pt;
-
+    saveStateForUndo();
     createNode(type, pos.x, pos.y);
     render();
   });
@@ -299,10 +299,9 @@ function finishConnection(e, ptSvg) {
   let { toNodeId, toPort } = findConnectionTarget(e, ptSvg);
 
   if (toNodeId && toPort) {
-    state.edges = state.edges.filter(edge => {
-      return !(edge.fromNodeId === fromNodeId && edge.fromPort === fromPort);
-    });
-    
+
+    saveStateForUndo();
+
     createEdge(fromNodeId, fromPort, toNodeId, toPort);
     render();
   }
@@ -312,8 +311,10 @@ function finishConnection(e, ptSvg) {
       state.connecting.tempLine
     );
   }
+
   state.connecting = null;
 }
+
 
 function findConnectionTarget(e, ptSvg) {
   let toNodeId = null;
@@ -370,6 +371,7 @@ function findClosestPort(node, ptSvg) {
 function startDragging(e, nodeGroup) {
   // Don't start drag when this is part of a double click
   if (e.detail === 2) return;
+  saveStateForUndo();
 
   e.stopPropagation();
   const clickedId = nodeGroup.dataset.id;
@@ -405,6 +407,7 @@ function startDragging(e, nodeGroup) {
 function startResizing(e, handle) {
   // Don't start resize when this is part of a double click
   if (e.detail === 2) return;
+  saveStateForUndo();
 
   e.stopPropagation();
   const nodeId = handle.dataset.nodeId;
@@ -455,7 +458,18 @@ function startConnecting(e, port) {
 function initKeyboard() {
   document.addEventListener('keydown', onDocumentKeydown);
 }
-
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key === "z") {
+    undo();
+    render();
+    e.preventDefault();
+  }
+  if (e.ctrlKey && (e.key === "y" || e.key === "Z")) {
+    redo();
+    render();
+    e.preventDefault();
+  }
+});
 function onDocumentKeydown(e) {
   // Only interested in Delete / Backspace / 'x'
   if (e.key !== 'Delete' && e.key !== 'Backspace' && e.key !== 'x') {
@@ -476,6 +490,7 @@ function onDocumentKeydown(e) {
   // Node(s) deletion
   const nodeIdsToDelete = getSelectedNodeIds();
   if (nodeIdsToDelete.length) {
+    saveStateForUndo();
     nodeIdsToDelete.forEach(id => deleteNode(id));
     state.selectedNodeId = null;
     state.selectedNodeIds = [];
@@ -567,7 +582,7 @@ function editNodeLabel(nodeGroup) {
   function finishEdit(applyChange) {
     if (finished) return;
     finished = true;
-
+    saveStateForUndo();
     if (applyChange) {
       const trimmed = input.value.trim();
       if (trimmed === '') {
@@ -640,7 +655,7 @@ function editEdgeLabel(edgeEl) {
   function finishEdit(applyChange) {
     if (finished) return;
     finished = true;
-
+    saveStateForUndo();
     if (applyChange) {
       edge.label = input.value.trim();
       render();

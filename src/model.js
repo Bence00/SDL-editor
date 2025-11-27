@@ -58,20 +58,6 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
 
   const fromNode = state.nodes.find(n => String(n.id) === fromIdStr);
 
-  state.edges = state.edges.filter(e => {
-    const sameToPort =
-      String(e.toNodeId) === toIdStr && e.toPort === toPort;
-
-    if (fromNode && fromNode.type !== 'decision') {
-      const sameFromNode = String(e.fromNodeId) === fromIdStr;
-      return !sameFromNode && !sameToPort;
-    } else {
-      const sameFromPort =
-        String(e.fromNodeId) === fromIdStr && e.fromPort === fromPort;
-      return !sameFromPort && !sameToPort;
-    }
-  });
-
   if (
     state.selectedEdgeId &&
     !state.edges.some(e => e.id === state.selectedEdgeId)
@@ -93,10 +79,10 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   state.edges.push(edge);
   return edge;
 }
-// melyik edge csatlakozik erre a portra?
 export function getEdgeAttachedTo(nodeId, portName) {
   return state.edges.find(e =>
     (e.fromNodeId === nodeId && e.fromPort === portName) ||
     (e.toNodeId === nodeId && e.toPort === portName)
   ) || null;
 }
+

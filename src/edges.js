@@ -35,7 +35,6 @@ export function drawSingleEdge(edge) {
 
   const d = `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
 
-  // <g>
   const g = document.createElementNS(SVG_NS, "g");
   g.dataset.edgeId = edge.id;
 

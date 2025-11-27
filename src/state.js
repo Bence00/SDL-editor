@@ -29,3 +29,42 @@ export function setSnapToGrid(enabled) {
 export function isSnapToGrid() {
   return !!state.snapToGrid;
 }
+
+export const history = {
+  undoStack: [],
+  redoStack: []
+};
+
+export function saveStateForUndo() {
+  history.undoStack.push({
+    nodes: JSON.parse(JSON.stringify(state.nodes)),
+    edges: JSON.parse(JSON.stringify(state.edges))
+  });
+  history.redoStack = [];
+}
+
+export function undo() {
+  if (history.undoStack.length === 0) return;
+
+  history.redoStack.push({
+    nodes: JSON.parse(JSON.stringify(state.nodes)),
+    edges: JSON.parse(JSON.stringify(state.edges))
+  });
+
+  const prev = history.undoStack.pop();
+  state.nodes = prev.nodes;
+  state.edges = prev.edges;
+}
+
+export function redo() {
+  if (history.redoStack.length === 0) return;
+
+  history.undoStack.push({
+    nodes: JSON.parse(JSON.stringify(state.nodes)),
+    edges: JSON.parse(JSON.stringify(state.edges))
+  });
+
+  const next = history.redoStack.pop();
+  state.nodes = next.nodes;
+  state.edges = next.edges;
+}

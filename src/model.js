@@ -83,7 +83,7 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   state.edges.push(edge);
 
   // Debug log for tracking edge IDs and the global counter.
-  console.log(
+  /* console.log(
     '[SDL] createEdge -> id:',
     id,
     'from:',
@@ -92,7 +92,7 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
     toNodeId,
     'nextId now:',
     state.nextId
-  );
+  );*/
 
   return edge;
 }

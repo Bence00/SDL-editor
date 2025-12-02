@@ -1,4 +1,3 @@
-// src/storageApi.js
 // Thin client around the PHP endpoints in /api for listing, loading,
 // saving and deleting diagrams.
 

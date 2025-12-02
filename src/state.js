@@ -1,6 +1,34 @@
+/**
+ * @typedef {Object} SDLNode
+ * @property {string|number} id
+ * @property {string} type      // e.g. "start", "state", "input", "output", "decision", "stop", ...
+ * @property {number} x
+ * @property {number} y
+ * @property {number} width
+ * @property {number} height
+ * @property {string=} name     // optional human-readable label
+ */
+
+/**
+ * @typedef {Object} SDLEdge
+ * @property {string} id
+ * @property {string|number} fromNodeId
+ * @property {string} fromPort          // "top" | "right" | "bottom" | "left"
+ * @property {string|number} toNodeId
+ * @property {string} toPort
+ * @property {string=} label
+ */
+
+/**
+ * Global editor state for the SDL canvas.
+ * All mutations should go through helper functions in model.js / interactions.js
+ * rather than rewriting this structure directly from elsewhere.
+ */
 export const state = {
-  nodes: [],      // { id, type, x, y, width, height }
-  edges: [],      // { id, fromNodeId, fromPort, toNodeId, toPort }
+  /** @type {SDLNode[]} */
+  nodes: [],
+  /** @type {SDLEdge[]} */
+  edges: [],
   selectedNodeId: null,
   selectedNodeIds: [],
   dragging: null,         // { nodes: [{ id, offsetX, offsetY }, ...] }

@@ -7,6 +7,12 @@ import { initInteractions } from './interactions.js';
 import { snapCheckbox, editorEl, btnSave, btnLoad } from './dom.js';
 import { setSnapToGrid, state } from './state.js';
 import { exportDiagram, importDiagram } from './storage.js';
+import {
+  listDiagrams,
+  loadDiagramFromServer,
+  saveDiagramToServer,
+  deleteDiagramOnServer
+} from './storageApi.js';
 
 // Lazy DOM fetch (not imported)
 const diagramNameInput = document.getElementById('diagramNameInput');
@@ -68,41 +74,22 @@ function getCurrentDiagramName() {
 async function saveDiagram(name = 'default') {
   const payload = exportDiagram();
 
-  const res = await fetch(
-    `api/save_diagram.php?name=${encodeURIComponent(name)}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }
-  );
+  const result = await saveDiagramToServer(name, payload);
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok || !data?.ok) {
-    console.error('Save failed:', res.status, data);
-    alert('Save failed.');
-    return;
+  if (!result.ok) {
+    alert('Save failed: ' + (result.error || 'unknown error'));
   }
-
-  console.log('Diagram saved as:', data.file || name);
 }
 
 async function loadDiagram(name = 'default') {
-  const res = await fetch(
-    `api/load_diagram.php?name=${encodeURIComponent(name)}`,
-    { method: 'GET' }
-  );
+  const result = await loadDiagramFromServer(name);
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok || !data?.ok) {
-    console.error('Load failed:', res.status, data);
-    alert('Load failed: ' + (data?.error || 'unknown error'));
+  if (!result.ok || !result.diagram) {
+    alert('Load failed: ' + (result.error || 'unknown error'));
     return;
   }
 
-  importDiagram(data.diagram);
+  importDiagram(result.diagram);
 }
 
 async function deleteDiagram(name) {
@@ -110,16 +97,10 @@ async function deleteDiagram(name) {
   const confirmed = window.confirm(`Delete diagram "${name}"? This cannot be undone.`);
   if (!confirmed) return;
 
-  const res = await fetch(
-    `api/delete_diagram.php?name=${encodeURIComponent(name)}`,
-    { method: 'POST' }
-  );
+  const result = await deleteDiagramOnServer(name);
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok || !data?.ok) {
-    console.error('Delete failed:', res.status, data);
-    alert('Delete failed: ' + (data?.error || 'unknown error'));
+  if (!result.ok) {
+    alert('Delete failed: ' + (result.error || 'unknown error'));
     return;
   }
 
@@ -134,15 +115,7 @@ async function deleteDiagram(name) {
 
 async function fetchDiagramList() {
   try {
-    const res = await fetch('api/list_diagrams.php');
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok || !data?.ok || !Array.isArray(data.names)) {
-      console.error('Diagram list fetch failed:', res.status, data);
-      return [];
-    }
-
-    return data.names;
+    return await listDiagrams();
   } catch (err) {
     console.error('Diagram list error:', err);
     return [];

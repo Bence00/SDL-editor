@@ -1,4 +1,4 @@
-import { SVG_NS } from './constants.js';
+import { SVG_NS, PORT_RADIUS } from './constants.js';
 import { svg } from './dom.js';
 import { state } from './state.js';
 import { getNodeById } from './model.js';
@@ -100,7 +100,7 @@ function renderNode(node) {
     c.dataset.port = name;
     c.setAttribute("cx", pos.x);
     c.setAttribute("cy", pos.y);
-    c.setAttribute("r", 4.5);
+    c.setAttribute("r", PORT_RADIUS);
     g.appendChild(c);
   }
 

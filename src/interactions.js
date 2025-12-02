@@ -8,14 +8,13 @@ import {
 } from './model.js';
 import { render } from './render.js';
 import { clientToSvgPoint, snapPointToGrid } from './utils.js';
-import { SVG_NS } from './constants.js';
+import { SVG_NS, SELECTION_DRAG_THRESHOLD, MIN_NODE_WIDTH, MIN_NODE_HEIGHT } from './constants.js';
 import { getNodeLabel } from './nodeShapes.js';
 
 /* --- STATE FOR INTERACTION --- */
 
 let selectionStart = null;
 let selectionRectEl = null;
-const SELECTION_DRAG_THRESHOLD = 3;
 
 /* ------------------------------------
                   PUBLIC INIT
@@ -211,8 +210,8 @@ function updateResizing(pt) {
 
   let dx2 = pt.x - startMouseX;
   let dy2 = pt.y - startMouseY;
-  let w = Math.max(40, startWidth + dx2);
-  let h = Math.max(30, startHeight + dy2);
+  let w = Math.max(MIN_NODE_WIDTH, startWidth + dx2);
+  let h = Math.max(MIN_NODE_HEIGHT, startHeight + dy2);
 
   // optional: snap resize
   if (isSnapToGrid()) {
@@ -253,7 +252,7 @@ function finishSelectionBox(pt) {
   const dy = pt.y - selectionStart.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
 
-  state.selectedEdgeId = null; // 🔹 box select → edge deselect
+  state.selectedEdgeId = null; // box select → edge deselect
 
   if (dist >= SELECTION_DRAG_THRESHOLD) {
     applySelectionBox(selectionStart, pt);

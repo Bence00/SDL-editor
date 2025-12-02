@@ -1,4 +1,5 @@
 import { svg } from './dom.js';
+import { GRID_SIZE } from './constants.js';
 
 export function clientToSvgPoint(clientX, clientY) {
   const pt = svg.createSVGPoint();
@@ -16,7 +17,7 @@ export function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function snapPointToGrid(x, y, gridSize = 20) {
+export function snapPointToGrid(x, y, gridSize = GRID_SIZE) {
   return {
     x: Math.round(x / gridSize) * gridSize,
     y: Math.round(y / gridSize) * gridSize

@@ -1,0 +1,266 @@
+{
+    "processes": {
+        "3": {
+            "id": "3",
+            "name": "PROCESS_3",
+            "start": {
+                "nodeId": "3",
+                "name": "START",
+                "x": 80,
+                "y": 60,
+                "width": 140,
+                "height": 80,
+                "transition": [
+                    {
+                        "nextstate": "7"
+                    }
+                ],
+                "newstate": "7"
+            },
+            "states": {
+                "7": {
+                    "nodeId": "7",
+                    "name": "READY",
+                    "x": 80,
+                    "y": 180,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                }
+            }
+        },
+        "4": {
+            "id": "4",
+            "name": "PROCESS_4",
+            "start": {
+                "nodeId": "4",
+                "name": "START",
+                "x": 340,
+                "y": 180,
+                "width": 140,
+                "height": 80,
+                "transition": [],
+                "newstate": null
+            },
+            "states": []
+        }
+    },
+    "nodes": [
+        {
+            "id": "3",
+            "type": "start",
+            "x": 80,
+            "y": 60,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "4",
+            "type": "start",
+            "x": 340,
+            "y": 180,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "7",
+            "type": "state",
+            "x": 80,
+            "y": 180,
+            "width": 140,
+            "height": 80,
+            "name": "READY"
+        },
+        {
+            "id": "9",
+            "type": "input",
+            "x": 80,
+            "y": 300,
+            "width": 140,
+            "height": 80,
+            "name": "PRODUCED"
+        },
+        {
+            "id": "11",
+            "type": "output",
+            "x": 80,
+            "y": 420,
+            "width": 140,
+            "height": 80,
+            "name": "MSG"
+        },
+        {
+            "id": "13",
+            "type": "state",
+            "x": 80,
+            "y": 540,
+            "width": 140,
+            "height": 80,
+            "name": "WAIT-ACK"
+        },
+        {
+            "id": "15",
+            "type": "state",
+            "x": 80,
+            "y": 780,
+            "width": 140,
+            "height": 80,
+            "name": "READY"
+        },
+        {
+            "id": "17",
+            "type": "state",
+            "x": 340,
+            "y": 300,
+            "width": 140,
+            "height": 80,
+            "name": "READY2"
+        },
+        {
+            "id": "18",
+            "type": "input",
+            "x": 340,
+            "y": 420,
+            "width": 140,
+            "height": 80,
+            "name": "MSG"
+        },
+        {
+            "id": "19",
+            "type": "output",
+            "x": 340,
+            "y": 540,
+            "width": 140,
+            "height": 80,
+            "name": "OUTPUT"
+        },
+        {
+            "id": "20",
+            "type": "output",
+            "x": 340,
+            "y": 660,
+            "width": 140,
+            "height": 80,
+            "name": "ACK"
+        },
+        {
+            "id": "21",
+            "type": "input",
+            "x": 80,
+            "y": 660,
+            "width": 140,
+            "height": 80,
+            "name": "ACK"
+        },
+        {
+            "id": "28",
+            "type": "state",
+            "x": 340,
+            "y": 780,
+            "width": 140,
+            "height": 80,
+            "name": "READY2"
+        },
+        {
+            "id": "5",
+            "type": "decision",
+            "x": 200,
+            "y": 120,
+            "width": 140,
+            "height": 80,
+            "name": null
+        }
+    ],
+    "edges": [
+        {
+            "id": "e8",
+            "fromNodeId": "3",
+            "fromPort": "bottom",
+            "toNodeId": "7",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e14",
+            "fromNodeId": "11",
+            "fromPort": "bottom",
+            "toNodeId": "13",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e22",
+            "fromNodeId": "13",
+            "fromPort": "bottom",
+            "toNodeId": "21",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e23",
+            "fromNodeId": "21",
+            "fromPort": "bottom",
+            "toNodeId": "15",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e25",
+            "fromNodeId": "17",
+            "fromPort": "bottom",
+            "toNodeId": "18",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e26",
+            "fromNodeId": "18",
+            "fromPort": "bottom",
+            "toNodeId": "19",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e27",
+            "fromNodeId": "19",
+            "fromPort": "bottom",
+            "toNodeId": "20",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e29",
+            "fromNodeId": "20",
+            "fromPort": "bottom",
+            "toNodeId": "28",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e4",
+            "fromNodeId": "9",
+            "fromPort": "bottom",
+            "toNodeId": "11",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e6",
+            "fromNodeId": "5",
+            "fromPort": "bottom",
+            "toNodeId": "9",
+            "toPort": "top",
+            "label": "no"
+        },
+        {
+            "id": "e7",
+            "fromNodeId": "5",
+            "fromPort": "bottom",
+            "toNodeId": "17",
+            "toPort": "top",
+            "label": "yes"
+        }
+    ]
+}

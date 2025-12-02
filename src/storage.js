@@ -31,6 +31,8 @@ export function exportDiagram() {
 
 /**
  * IMPORT — restores nodes + edges + positions + labels
+ * Also re-computes `state.nextId` so that newly created nodes/edges
+ * never reuse an ID from the loaded diagram.
  */
 export function importDiagram(diagram) {
   if (!diagram || !Array.isArray(diagram.nodes) || !Array.isArray(diagram.edges)) {
@@ -56,6 +58,33 @@ export function importDiagram(diagram) {
     toPort: e.toPort,
     label: e.label || ""
   }));
+
+  // Recalculate the nextId counter to avoid ID collisions after load.
+  // We look at numeric parts of both node IDs and edge IDs (e.g. "e12").
+  let maxNumericId = 0;
+
+  diagram.nodes.forEach(n => {
+    const numeric = parseInt(String(n.id).replace(/\D+/g, ''), 10);
+    if (!Number.isNaN(numeric) && numeric > maxNumericId) {
+      maxNumericId = numeric;
+    }
+  });
+
+  diagram.edges.forEach(e => {
+    const numeric = parseInt(String(e.id).replace(/\D+/g, ''), 10);
+    if (!Number.isNaN(numeric) && numeric > maxNumericId) {
+      maxNumericId = numeric;
+    }
+  });
+
+  // Next created ID should be strictly larger than anything loaded.
+  state.nextId = maxNumericId + 1;
+
+  // Debug log to inspect loaded IDs and the recomputed counter.
+  console.log('[SDL] importDiagram:');
+  console.log('  node IDs:', diagram.nodes.map(n => n.id));
+  console.log('  edge IDs:', diagram.edges.map(e => e.id));
+  console.log('  recomputed nextId:', state.nextId);
 
   // Reset selections
   state.selectedNodeId = null;

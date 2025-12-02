@@ -17,6 +17,10 @@ export function createNode(type, x, y) {
   };
 
   state.nodes.push(node);
+
+  // Debug log for tracking node IDs and the global counter.
+  console.log('[SDL] createNode -> id:', id, 'type:', type, 'nextId now:', state.nextId);
+
   return node;
 }
 
@@ -77,6 +81,19 @@ export function createEdge(fromNodeId, fromPort, toNodeId, toPort) {
   };
 
   state.edges.push(edge);
+
+  // Debug log for tracking edge IDs and the global counter.
+  console.log(
+    '[SDL] createEdge -> id:',
+    id,
+    'from:',
+    fromNodeId,
+    'to:',
+    toNodeId,
+    'nextId now:',
+    state.nextId
+  );
+
   return edge;
 }
 export function getEdgeAttachedTo(nodeId, portName) {

@@ -38,7 +38,8 @@ export const history = {
 export function saveStateForUndo() {
   history.undoStack.push({
     nodes: JSON.parse(JSON.stringify(state.nodes)),
-    edges: JSON.parse(JSON.stringify(state.edges))
+    edges: JSON.parse(JSON.stringify(state.edges)),
+    nextId: state.nextId
   });
   history.redoStack = [];
 }
@@ -48,12 +49,16 @@ export function undo() {
 
   history.redoStack.push({
     nodes: JSON.parse(JSON.stringify(state.nodes)),
-    edges: JSON.parse(JSON.stringify(state.edges))
+    edges: JSON.parse(JSON.stringify(state.edges)),
+    nextId: state.nextId
   });
 
   const prev = history.undoStack.pop();
   state.nodes = prev.nodes;
   state.edges = prev.edges;
+  if (typeof prev.nextId === 'number' && !Number.isNaN(prev.nextId)) {
+    state.nextId = prev.nextId;
+  }
 }
 
 export function redo() {
@@ -61,10 +66,14 @@ export function redo() {
 
   history.undoStack.push({
     nodes: JSON.parse(JSON.stringify(state.nodes)),
-    edges: JSON.parse(JSON.stringify(state.edges))
+    edges: JSON.parse(JSON.stringify(state.edges)),
+    nextId: state.nextId
   });
 
   const next = history.redoStack.pop();
   state.nodes = next.nodes;
   state.edges = next.edges;
+  if (typeof next.nextId === 'number' && !Number.isNaN(next.nextId)) {
+    state.nextId = next.nextId;
+  }
 }

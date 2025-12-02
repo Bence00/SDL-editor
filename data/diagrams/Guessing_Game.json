@@ -1,0 +1,542 @@
+{
+    "processes": {
+        "32": {
+            "id": "32",
+            "name": "PROCESS_32",
+            "start": {
+                "nodeId": "32",
+                "name": "START",
+                "x": 200,
+                "y": 20,
+                "width": 140,
+                "height": 80,
+                "transition": [
+                    {
+                        "nextstate": "64"
+                    }
+                ],
+                "newstate": "64"
+            },
+            "states": {
+                "52": {
+                    "nodeId": "52",
+                    "name": "IDLE",
+                    "x": 200,
+                    "y": 220,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "60"
+                        }
+                    ]
+                },
+                "54": {
+                    "nodeId": "54",
+                    "name": "IDLE",
+                    "x": 200,
+                    "y": 760,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                },
+                "57": {
+                    "nodeId": "57",
+                    "name": "INIT(sender, N) to offspring",
+                    "x": 200,
+                    "y": 640,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "54"
+                        }
+                    ]
+                },
+                "59": {
+                    "nodeId": "59",
+                    "name": "GAME",
+                    "x": 200,
+                    "y": 420,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "67"
+                        }
+                    ]
+                },
+                "60": {
+                    "nodeId": "60",
+                    "name": "CALL",
+                    "x": 200,
+                    "y": 320,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "59"
+                        }
+                    ]
+                },
+                "64": {
+                    "nodeId": "64",
+                    "name": "N:=0",
+                    "x": 200,
+                    "y": 120,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "52"
+                        }
+                    ]
+                },
+                "67": {
+                    "nodeId": "67",
+                    "name": "N++",
+                    "x": 200,
+                    "y": 540,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "57"
+                        }
+                    ]
+                }
+            }
+        },
+        "33": {
+            "id": "33",
+            "name": "PROCESS_33",
+            "start": {
+                "nodeId": "33",
+                "name": "START",
+                "x": 460,
+                "y": 20,
+                "width": 140,
+                "height": 80,
+                "transition": [
+                    {
+                        "nextstate": "34"
+                    }
+                ],
+                "newstate": "34"
+            },
+            "states": {
+                "34": {
+                    "nodeId": "34",
+                    "name": "IDLE",
+                    "x": 460,
+                    "y": 120,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "36"
+                        }
+                    ]
+                },
+                "36": {
+                    "nodeId": "36",
+                    "name": "INIT (PLAYER, N)",
+                    "x": 460,
+                    "y": 220,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "38"
+                        }
+                    ]
+                },
+                "38": {
+                    "nodeId": "38",
+                    "name": "PROMPT to PLAYER",
+                    "x": 460,
+                    "y": 320,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "40"
+                        }
+                    ]
+                },
+                "40": {
+                    "nodeId": "40",
+                    "name": "WAIT",
+                    "x": 460,
+                    "y": 440,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "42"
+                        }
+                    ]
+                },
+                "42": {
+                    "nodeId": "42",
+                    "name": "GUESS(M)",
+                    "x": 460,
+                    "y": 540,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "44"
+                        }
+                    ]
+                },
+                "44": {
+                    "nodeId": "44",
+                    "name": "N==M ?",
+                    "x": 460,
+                    "y": 640,
+                    "width": 140,
+                    "height": 80,
+                    "decision": {
+                        "expr": "N==M ?",
+                        "branches": {
+                            "false": {
+                                "transition": [],
+                                "nextstate": "50"
+                            },
+                            "true": {
+                                "transition": [],
+                                "nextstate": "46"
+                            }
+                        }
+                    }
+                },
+                "46": {
+                    "nodeId": "46",
+                    "name": "WINNER",
+                    "x": 660,
+                    "y": 700,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "48"
+                        }
+                    ]
+                },
+                "48": {
+                    "nodeId": "48",
+                    "name": "STATE_48",
+                    "x": 660,
+                    "y": 840,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                },
+                "50": {
+                    "nodeId": "50",
+                    "name": "STATE_50",
+                    "x": 460,
+                    "y": 760,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                }
+            }
+        }
+    },
+    "nodes": [
+        {
+            "id": "32",
+            "type": "start",
+            "x": 200,
+            "y": 20,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "33",
+            "type": "start",
+            "x": 460,
+            "y": 20,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "34",
+            "type": "state",
+            "x": 460,
+            "y": 120,
+            "width": 140,
+            "height": 80,
+            "name": "IDLE"
+        },
+        {
+            "id": "36",
+            "type": "input",
+            "x": 460,
+            "y": 220,
+            "width": 140,
+            "height": 80,
+            "name": "INIT (PLAYER, N)"
+        },
+        {
+            "id": "38",
+            "type": "output",
+            "x": 460,
+            "y": 320,
+            "width": 140,
+            "height": 80,
+            "name": "PROMPT to PLAYER"
+        },
+        {
+            "id": "40",
+            "type": "state",
+            "x": 460,
+            "y": 440,
+            "width": 140,
+            "height": 80,
+            "name": "WAIT"
+        },
+        {
+            "id": "42",
+            "type": "input",
+            "x": 460,
+            "y": 540,
+            "width": 140,
+            "height": 80,
+            "name": "GUESS(M)"
+        },
+        {
+            "id": "44",
+            "type": "decision",
+            "x": 460,
+            "y": 640,
+            "width": 140,
+            "height": 80,
+            "name": "N==M ?"
+        },
+        {
+            "id": "46",
+            "type": "output",
+            "x": 660,
+            "y": 700,
+            "width": 140,
+            "height": 80,
+            "name": "WINNER"
+        },
+        {
+            "id": "48",
+            "type": "stop",
+            "x": 660,
+            "y": 840,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "50",
+            "type": "stop",
+            "x": 460,
+            "y": 760,
+            "width": 140,
+            "height": 80,
+            "name": null
+        },
+        {
+            "id": "52",
+            "type": "state",
+            "x": 200,
+            "y": 220,
+            "width": 140,
+            "height": 80,
+            "name": "IDLE"
+        },
+        {
+            "id": "54",
+            "type": "state",
+            "x": 200,
+            "y": 760,
+            "width": 140,
+            "height": 80,
+            "name": "IDLE"
+        },
+        {
+            "id": "57",
+            "type": "output",
+            "x": 200,
+            "y": 640,
+            "width": 140,
+            "height": 80,
+            "name": "INIT(sender, N) to offspring"
+        },
+        {
+            "id": "59",
+            "type": "createTask",
+            "x": 200,
+            "y": 420,
+            "width": 140,
+            "height": 80,
+            "name": "GAME"
+        },
+        {
+            "id": "60",
+            "type": "input",
+            "x": 200,
+            "y": 320,
+            "width": 140,
+            "height": 80,
+            "name": "CALL"
+        },
+        {
+            "id": "64",
+            "type": "task",
+            "x": 200,
+            "y": 120,
+            "width": 140,
+            "height": 80,
+            "name": "N:=0"
+        },
+        {
+            "id": "67",
+            "type": "task",
+            "x": 200,
+            "y": 540,
+            "width": 140,
+            "height": 80,
+            "name": "N++"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e35",
+            "fromNodeId": "33",
+            "fromPort": "bottom",
+            "toNodeId": "34",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e37",
+            "fromNodeId": "34",
+            "fromPort": "bottom",
+            "toNodeId": "36",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e39",
+            "fromNodeId": "36",
+            "fromPort": "bottom",
+            "toNodeId": "38",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e41",
+            "fromNodeId": "38",
+            "fromPort": "bottom",
+            "toNodeId": "40",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e43",
+            "fromNodeId": "40",
+            "fromPort": "bottom",
+            "toNodeId": "42",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e45",
+            "fromNodeId": "42",
+            "fromPort": "bottom",
+            "toNodeId": "44",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e49",
+            "fromNodeId": "46",
+            "fromPort": "bottom",
+            "toNodeId": "48",
+            "toPort": "right",
+            "label": ""
+        },
+        {
+            "id": "e51",
+            "fromNodeId": "44",
+            "fromPort": "bottom",
+            "toNodeId": "50",
+            "toPort": "right",
+            "label": "false"
+        },
+        {
+            "id": "e58",
+            "fromNodeId": "57",
+            "fromPort": "bottom",
+            "toNodeId": "54",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e61",
+            "fromNodeId": "60",
+            "fromPort": "bottom",
+            "toNodeId": "59",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e63",
+            "fromNodeId": "52",
+            "fromPort": "bottom",
+            "toNodeId": "60",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e65",
+            "fromNodeId": "32",
+            "fromPort": "bottom",
+            "toNodeId": "64",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e66",
+            "fromNodeId": "64",
+            "fromPort": "bottom",
+            "toNodeId": "52",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e68",
+            "fromNodeId": "67",
+            "fromPort": "bottom",
+            "toNodeId": "57",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e69",
+            "fromNodeId": "59",
+            "fromPort": "bottom",
+            "toNodeId": "67",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e71",
+            "fromNodeId": "44",
+            "fromPort": "right",
+            "toNodeId": "46",
+            "toPort": "top",
+            "label": "true"
+        }
+    ]
+}

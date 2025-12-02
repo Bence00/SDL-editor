@@ -1,0 +1,302 @@
+{
+    "processes": {
+        "40": {
+            "id": "40",
+            "name": "Start",
+            "start": {
+                "nodeId": "40",
+                "name": "Start",
+                "x": 220,
+                "y": 80,
+                "width": 140,
+                "height": 80,
+                "transition": [
+                    {
+                        "nextstate": "41"
+                    }
+                ],
+                "newstate": "41"
+            },
+            "states": {
+                "41": {
+                    "nodeId": "41",
+                    "name": "A",
+                    "x": 220,
+                    "y": 200,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "43"
+                        },
+                        {
+                            "nextstate": "49"
+                        }
+                    ]
+                },
+                "43": {
+                    "nodeId": "43",
+                    "name": "large coin",
+                    "x": 220,
+                    "y": 320,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "45"
+                        }
+                    ]
+                },
+                "45": {
+                    "nodeId": "45",
+                    "name": "choc",
+                    "x": 220,
+                    "y": 440,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "47"
+                        }
+                    ]
+                },
+                "47": {
+                    "nodeId": "47",
+                    "name": "C",
+                    "x": 220,
+                    "y": 560,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                },
+                "49": {
+                    "nodeId": "49",
+                    "name": "small coin",
+                    "x": 460,
+                    "y": 320,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "51"
+                        }
+                    ]
+                },
+                "51": {
+                    "nodeId": "51",
+                    "name": "B",
+                    "x": 460,
+                    "y": 440,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "53"
+                        }
+                    ]
+                },
+                "53": {
+                    "nodeId": "53",
+                    "name": "small coin",
+                    "x": 460,
+                    "y": 560,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "55"
+                        }
+                    ]
+                },
+                "55": {
+                    "nodeId": "55",
+                    "name": "choc",
+                    "x": 460,
+                    "y": 680,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": [
+                        {
+                            "nextstate": "57"
+                        }
+                    ]
+                },
+                "57": {
+                    "nodeId": "57",
+                    "name": "C",
+                    "x": 460,
+                    "y": 800,
+                    "width": 140,
+                    "height": 80,
+                    "transitions": []
+                }
+            }
+        }
+    },
+    "nodes": [
+        {
+            "id": "40",
+            "type": "start",
+            "x": 220,
+            "y": 80,
+            "width": 140,
+            "height": 80,
+            "name": "Start"
+        },
+        {
+            "id": "41",
+            "type": "state",
+            "x": 220,
+            "y": 200,
+            "width": 140,
+            "height": 80,
+            "name": "A"
+        },
+        {
+            "id": "43",
+            "type": "input",
+            "x": 220,
+            "y": 320,
+            "width": 140,
+            "height": 80,
+            "name": "large coin"
+        },
+        {
+            "id": "45",
+            "type": "output",
+            "x": 220,
+            "y": 440,
+            "width": 140,
+            "height": 80,
+            "name": "choc"
+        },
+        {
+            "id": "47",
+            "type": "state",
+            "x": 220,
+            "y": 560,
+            "width": 140,
+            "height": 80,
+            "name": "C"
+        },
+        {
+            "id": "49",
+            "type": "input",
+            "x": 460,
+            "y": 320,
+            "width": 140,
+            "height": 80,
+            "name": "small coin"
+        },
+        {
+            "id": "51",
+            "type": "state",
+            "x": 460,
+            "y": 440,
+            "width": 140,
+            "height": 80,
+            "name": "B"
+        },
+        {
+            "id": "53",
+            "type": "input",
+            "x": 460,
+            "y": 560,
+            "width": 140,
+            "height": 80,
+            "name": "small coin"
+        },
+        {
+            "id": "55",
+            "type": "input",
+            "x": 460,
+            "y": 680,
+            "width": 140,
+            "height": 80,
+            "name": "choc"
+        },
+        {
+            "id": "57",
+            "type": "state",
+            "x": 460,
+            "y": 800,
+            "width": 140,
+            "height": 80,
+            "name": "C"
+        }
+    ],
+    "edges": [
+        {
+            "id": "e42",
+            "fromNodeId": "40",
+            "fromPort": "bottom",
+            "toNodeId": "41",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e44",
+            "fromNodeId": "41",
+            "fromPort": "bottom",
+            "toNodeId": "43",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e46",
+            "fromNodeId": "43",
+            "fromPort": "bottom",
+            "toNodeId": "45",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e48",
+            "fromNodeId": "45",
+            "fromPort": "bottom",
+            "toNodeId": "47",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e50",
+            "fromNodeId": "41",
+            "fromPort": "bottom",
+            "toNodeId": "49",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e52",
+            "fromNodeId": "49",
+            "fromPort": "bottom",
+            "toNodeId": "51",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e54",
+            "fromNodeId": "51",
+            "fromPort": "bottom",
+            "toNodeId": "53",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e56",
+            "fromNodeId": "53",
+            "fromPort": "bottom",
+            "toNodeId": "55",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e58",
+            "fromNodeId": "55",
+            "fromPort": "bottom",
+            "toNodeId": "57",
+            "toPort": "top",
+            "label": ""
+        }
+    ]
+}

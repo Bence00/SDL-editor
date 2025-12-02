@@ -180,40 +180,57 @@ const SHAPES = {
   // --- stop X symbol (SDL STOP) ---------------------------------
   stopX(node) {
     const g = svgEl("g");
+  
     const cx = node.x + node.width / 2;
     const cy = node.y + node.height / 2;
-    const size = Math.min(node.width, node.height);
-    const half = size / 2;
-
+    const r = Math.min(node.width, node.height) / 2;
+  
+    // Keep hitbox (square) for easy clicking
     const hitbox = svgEl("rect", {
-      x: cx - half,
-      y: cy - half,
-      width: size,
-      height: size,
+      x: cx - r,
+      y: cy - r,
+      width: r * 2,
+      height: r * 2,
       fill: DEFAULT_FILL,
       "fill-opacity": 0,
       stroke: "none"
     });
     g.appendChild(hitbox);
-
-    const l1 = svgEl("line", {
-      x1: cx - half, y1: cy - half,
-      x2: cx + half, y2: cy + half,
+  
+    // Circle outline
+    g.appendChild(svgEl("circle", {
+      cx,
+      cy,
+      r,
+      fill: "none",
       stroke: DEFAULT_STROKE,
-      "stroke-width": 2
-    });
-    g.appendChild(l1);
-
-    const l2 = svgEl("line", {
-      x1: cx + half, y1: cy - half,
-      x2: cx - half, y2: cy + half,
+      "stroke-width": 1
+    }));
+  
+    const s = r * Math.SQRT1_2;  
+    // == r / √2 == radius * 0.7071
+    // The exact intersection point of a 45° line with the circle.
+  
+    // Diagonal 1 (top-left → bottom-right)
+    g.appendChild(svgEl("line", {
+      x1: cx - s, y1: cy - s,
+      x2: cx + s, y2: cy + s,
       stroke: DEFAULT_STROKE,
-      "stroke-width": 2
-    });
-    g.appendChild(l2);
-
+      "stroke-width": 1
+    }));
+  
+    // Diagonal 2 (top-right → bottom-left)
+    g.appendChild(svgEl("line", {
+      x1: cx + s, y1: cy - s,
+      x2: cx - s, y2: cy + s,
+      stroke: DEFAULT_STROKE,
+      "stroke-width": 1
+    }));
+  
     return g;
   },
+  
+  
 
   // --- folded corner (SDL DECLARATION) ---------------------------
   foldCorner(node) {

@@ -6,19 +6,16 @@
             "start": {
                 "nodeId": "3",
                 "name": "START",
-                "x": 200,
-                "y": 60,
+                "x": 80,
+                "y": 40,
                 "width": 140,
                 "height": 80,
                 "transition": [
                     {
                         "nextstate": "7"
-                    },
-                    {
-                        "nextstate": "4"
                     }
                 ],
-                "newstate": null
+                "newstate": "7"
             },
             "states": {
                 "7": {
@@ -82,58 +79,6 @@
                     "height": 80,
                     "transitions": []
                 },
-                "17": {
-                    "nodeId": "17",
-                    "name": "READY2",
-                    "x": 340,
-                    "y": 300,
-                    "width": 140,
-                    "height": 80,
-                    "transitions": [
-                        {
-                            "nextstate": "18"
-                        }
-                    ]
-                },
-                "18": {
-                    "nodeId": "18",
-                    "name": "MSG",
-                    "x": 340,
-                    "y": 420,
-                    "width": 140,
-                    "height": 80,
-                    "transitions": [
-                        {
-                            "nextstate": "19"
-                        }
-                    ]
-                },
-                "19": {
-                    "nodeId": "19",
-                    "name": "OUTPUT",
-                    "x": 340,
-                    "y": 540,
-                    "width": 140,
-                    "height": 80,
-                    "transitions": [
-                        {
-                            "nextstate": "20"
-                        }
-                    ]
-                },
-                "20": {
-                    "nodeId": "20",
-                    "name": "ACK",
-                    "x": 340,
-                    "y": 660,
-                    "width": 140,
-                    "height": 80,
-                    "transitions": [
-                        {
-                            "nextstate": "28"
-                        }
-                    ]
-                },
                 "21": {
                     "nodeId": "21",
                     "name": "ACK",
@@ -146,15 +91,6 @@
                             "nextstate": "15"
                         }
                     ]
-                },
-                "28": {
-                    "nodeId": "28",
-                    "name": "READY2",
-                    "x": 340,
-                    "y": 780,
-                    "width": 140,
-                    "height": 80,
-                    "transitions": []
                 }
             }
         },
@@ -244,8 +180,8 @@
         {
             "id": "3",
             "type": "start",
-            "x": 200,
-            "y": 60,
+            "x": 80,
+            "y": 40,
             "width": 140,
             "height": 80,
             "name": null
@@ -446,14 +382,6 @@
             "fromPort": "bottom",
             "toNodeId": "17",
             "toPort": "top",
-            "label": ""
-        },
-        {
-            "id": "e32",
-            "fromNodeId": "3",
-            "fromPort": "bottom",
-            "toNodeId": "4",
-            "toPort": "left",
             "label": ""
         }
     ]

@@ -265,6 +265,19 @@ function finishConnection(e, ptSvg) {
     }
   }
 
+  // Enforce: only one edge is allowed from one node to another (per direction).
+  const fromIdStr2 = String(fromNodeId);
+  const toIdStr2 = String(toNodeId);
+  const edgeAlreadyExists = state.edges.some(
+    e =>
+      String(e.fromNodeId) === fromIdStr2 &&
+      String(e.toNodeId) === toIdStr2
+  );
+  if (edgeAlreadyExists) {
+    cleanupTempConnection();
+    return;
+  }
+
   saveStateForUndo();
   createEdge(fromNodeId, fromPort, toNodeId, toPort);
   render();

@@ -1,19 +1,14 @@
--decision different branching names with save/load 
+
 -text label anywhere on the canvas
--decision with more than 2 branches dinamically
 -reset to default size selected node(s)
 -ctrl selection
-
--resize handles for selected nodes
 -settings panel
--arrows only after...(protocol)
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
 -movement on the canvas
 -zoom & grab canvas  
   
 -long name breaks in nodes
 -save diagram as png
--rule-based connection validation
 
 -better save JSON format for future interpreter (multi process mode defined by start nodes)
 -SDL code convert from JSON 
@@ -37,3 +32,9 @@ DONE:
 -unique IDs after loading previous diagrams
 2025.11.27:
 -undo/redo (Ctrl+Z / Ctrl+Y)
+2025.12.02:
+-unique IDs bug solved  
+-arrow into states
+-better code structure
+-connections validations (start node → max 1 outgoing edge, no self-connections, no duplicate edges between two nodes)
+-decision different branching names with save/load 

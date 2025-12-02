@@ -247,7 +247,9 @@ function finishConnection(e, ptSvg) {
   let { toNodeId, toPort } = findConnectionTarget(e, ptSvg);
 
   // Prevent connecting a port directly into itself (same node + same port).
-  if (!toNodeId || !toPort || (toNodeId === fromNodeId && toPort === fromPort)) {
+  // Prevent connecting a node to itself (any port)
+  if (!toNodeId || !toPort || toNodeId === fromNodeId) {
+
     cleanupTempConnection();
     return;
   }

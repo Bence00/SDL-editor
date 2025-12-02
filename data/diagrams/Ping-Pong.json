@@ -305,22 +305,6 @@
             "label": ""
         },
         {
-            "id": "e10",
-            "fromNodeId": "7",
-            "fromPort": "bottom",
-            "toNodeId": "9",
-            "toPort": "top",
-            "label": ""
-        },
-        {
-            "id": "e12",
-            "fromNodeId": "9",
-            "fromPort": "bottom",
-            "toNodeId": "11",
-            "toPort": "top",
-            "label": ""
-        },
-        {
             "id": "e14",
             "fromNodeId": "11",
             "fromPort": "bottom",
@@ -341,14 +325,6 @@
             "fromNodeId": "21",
             "fromPort": "bottom",
             "toNodeId": "15",
-            "toPort": "top",
-            "label": ""
-        },
-        {
-            "id": "e24",
-            "fromNodeId": "4",
-            "fromPort": "bottom",
-            "toNodeId": "17",
             "toPort": "top",
             "label": ""
         },
@@ -381,6 +357,30 @@
             "fromNodeId": "20",
             "fromPort": "bottom",
             "toNodeId": "28",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e4",
+            "fromNodeId": "9",
+            "fromPort": "bottom",
+            "toNodeId": "11",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e30",
+            "fromNodeId": "7",
+            "fromPort": "bottom",
+            "toNodeId": "9",
+            "toPort": "top",
+            "label": ""
+        },
+        {
+            "id": "e31",
+            "fromNodeId": "4",
+            "fromPort": "bottom",
+            "toNodeId": "17",
             "toPort": "top",
             "label": ""
         }

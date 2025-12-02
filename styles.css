@@ -311,10 +311,34 @@ html, body {
   padding: 6px 12px;
   font-size: 13px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .load-list-item:hover {
   background: #f3f3f3;
+}
+
+.load-list-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.load-list-delete {
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 13px;
+}
+
+.load-list-delete:hover {
+  color: #c00;
 }
 
 

@@ -19,7 +19,7 @@ export function createNode(type, x, y) {
   state.nodes.push(node);
 
   // Debug log for tracking node IDs and the global counter.
-  console.log('[SDL] createNode -> id:', id, 'type:', type, 'nextId now:', state.nextId);
+  //console.log('[SDL] createNode -> id:', id, 'type:', type, 'nextId now:', state.nextId);
 
   return node;
 }

@@ -105,6 +105,28 @@ async function loadDiagram(name = 'default') {
   importDiagram(data.diagram);
 }
 
+async function deleteDiagram(name) {
+  if (!name) return;
+  const confirmed = window.confirm(`Delete diagram "${name}"? This cannot be undone.`);
+  if (!confirmed) return;
+
+  const res = await fetch(
+    `api/delete_diagram.php?name=${encodeURIComponent(name)}`,
+    { method: 'POST' }
+  );
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok || !data?.ok) {
+    console.error('Delete failed:', res.status, data);
+    alert('Delete failed: ' + (data?.error || 'unknown error'));
+    return;
+  }
+
+  // Refresh the list after a successful delete
+  await populateLoadPanel();
+}
+
 
 // ============================================================
 // LOAD PANEL – Fetch saved diagrams
@@ -157,14 +179,29 @@ async function populateLoadPanel() {
   names.forEach(name => {
     const item = document.createElement('div');
     item.className = 'load-list-item';
-    item.textContent = name;
 
-    item.addEventListener('click', () => {
+    // Name label
+    const label = document.createElement('span');
+    label.textContent = name;
+    label.className = 'load-list-name';
+    label.addEventListener('click', () => {
       loadDiagram(name);
       hideLoadPanel();
       if (diagramNameInput) diagramNameInput.value = name;
     });
 
+    // Delete button (small "x" on the right)
+    const del = document.createElement('button');
+    del.className = 'load-list-delete';
+    del.type = 'button';
+    del.textContent = '✕';
+    del.addEventListener('click', (ev) => {
+      ev.stopPropagation(); // don't trigger load
+      deleteDiagram(name);
+    });
+
+    item.appendChild(label);
+    item.appendChild(del);
     loadList.appendChild(item);
   });
 }

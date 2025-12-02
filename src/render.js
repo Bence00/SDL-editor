@@ -58,6 +58,9 @@ export function render() {
 // ======================================================
 function clearSvg() {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  // SVG <defs> (including the arrowhead marker) are removed by the clear.
+  // Force re‑creation on the next render so markers keep working.
+  defsInitialized = false;
 }
 
 // ======================================================

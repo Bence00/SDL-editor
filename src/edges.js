@@ -44,7 +44,10 @@ export function drawSingleEdge(edge) {
   const line = document.createElementNS(SVG_NS, "path");
   line.setAttribute("d", d);
   line.setAttribute("class", "edge-line");
-  line.setAttribute("marker-end", "url(#arrowhead)");
+  // Only edges that go *into* a state or a stop get an arrowhead.
+  if (toNode.type === "state" || toNode.type === "stop") {
+    line.setAttribute("marker-end", "url(#arrowhead)");
+  }
   line.dataset.edgeId = edge.id;
 
   if (state.selectedEdgeId === edge.id) {

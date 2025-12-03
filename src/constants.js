@@ -8,7 +8,7 @@ export const GRID_SIZE = 20;
 
 // Minimum drag distance (in SVG units) before a box drag becomes
 // a selection rectangle instead of a simple click.
-export const SELECTION_DRAG_THRESHOLD = 300;
+export const SELECTION_DRAG_THRESHOLD = 3;
 
 // Minimum node size while resizing.
 export const MIN_NODE_WIDTH = 40;

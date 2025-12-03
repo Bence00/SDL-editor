@@ -214,8 +214,8 @@
                 "46": {
                     "nodeId": "46",
                     "name": "WINNER",
-                    "x": 660,
-                    "y": 700,
+                    "x": 640,
+                    "y": 720,
                     "width": 140,
                     "height": 80,
                     "transitions": [
@@ -227,8 +227,8 @@
                 "48": {
                     "nodeId": "48",
                     "name": "STATE_48",
-                    "x": 660,
-                    "y": 840,
+                    "x": 640,
+                    "y": 820,
                     "width": 140,
                     "height": 80,
                     "transitions": []
@@ -321,8 +321,8 @@
         {
             "id": "46",
             "type": "output",
-            "x": 660,
-            "y": 700,
+            "x": 640,
+            "y": 720,
             "width": 140,
             "height": 80,
             "name": "WINNER"
@@ -330,8 +330,8 @@
         {
             "id": "48",
             "type": "stop",
-            "x": 660,
-            "y": 840,
+            "x": 640,
+            "y": 820,
             "width": 140,
             "height": 80,
             "name": null

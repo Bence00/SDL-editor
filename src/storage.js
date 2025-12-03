@@ -80,12 +80,6 @@ export function importDiagram(diagram) {
   // Next created ID should be strictly larger than anything loaded.
   state.nextId = maxNumericId + 1;
 
-  // Debug log to inspect loaded IDs and the recomputed counter.
-  console.log('[SDL] importDiagram:');
-  console.log('  node IDs:', diagram.nodes.map(n => n.id));
-  console.log('  edge IDs:', diagram.edges.map(e => e.id));
-  console.log('  recomputed nextId:', state.nextId);
-
   // Reset selections
   state.selectedNodeId = null;
   state.selectedNodeIds = [];

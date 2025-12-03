@@ -4,8 +4,6 @@
 -ctrl selection
 -settings panel
 -documentation and help links about SDL (https://github.com/csurgay/sdl)
--movement on the canvas
--zoom & grab canvas  
   
 -long name breaks in nodes
 -save diagram as png
@@ -38,3 +36,5 @@ DONE:
 -better code structure
 -connections validations (start node → max 1 outgoing edge, no self-connections, no duplicate edges between two nodes)
 -decision different branching names with save/load 
+2025.12.03:
+-zoom & grab canvas  

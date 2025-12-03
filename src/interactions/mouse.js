@@ -9,12 +9,23 @@ import { getNodeLabel } from '../nodeShapes.js';
 let selectionStart = null;
 let selectionRectEl = null;
 
+// --- Canvas pan / zoom state ---
+let viewBoxState = null;      // { x, y, width, height }
+let initialViewBox = null;    // { width, height }
+let isPanning = false;
+let panLastPt = null;         // last mouse position in SVG coords during pan
+
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 3.0;
+const ZOOM_STEP = 1.1;        // per wheel notch
+
 export function initMouseInteractions() {
   initMouse();
 }
 
 function initMouse() {
   svg.addEventListener('mousedown', onSvgMouseDown);
+  svg.addEventListener('wheel', onSvgWheel, { passive: false });
   document.addEventListener('mousemove', onDocumentMouseMove);
   document.addEventListener('mouseup', onDocumentMouseUp);
 }
@@ -22,6 +33,17 @@ function initMouse() {
 // --- Mouse Down Handlers ---
 
 function onSvgMouseDown(e) {
+  // Only left or middle button should trigger canvas logic
+  //  - Left on empty canvas → selection box
+  //  - Ctrl + left on empty canvas → pan
+  //  - Left on node/handles/ports → existing behavior (drag/resize/connect)
+  //  - Middle anywhere on canvas → pan
+  if (e.button === 1) {
+    startPanning(e);
+    return;
+  }
+  if (e.button !== 0) return;
+
   // If this is the second click of a double click, prevent drag/selection
   if (e.detail === 2) return;
 
@@ -52,9 +74,15 @@ function onSvgMouseDown(e) {
     return;
   }
 
-  // Empty canvas click → start selection box
+  // Empty canvas click
   if (target === svg) {
-    startSelectionBox(e);
+    if (e.ctrlKey) {
+      // Ctrl + left drag on empty canvas → pan
+      startPanning(e);
+    } else {
+      // Plain left drag on empty canvas → selection box
+      startSelectionBox(e);
+    }
     return;
   }
 }
@@ -100,6 +128,12 @@ function startSelectionBox(e) {
 // --- Mouse Move Handler ---
 
 function onDocumentMouseMove(e) {
+  // While panning, work in screen space so zoom level doesn't break movement math
+  if (isPanning) {
+    updatePanning(e);
+    return;
+  }
+
   const pt = clientToSvgPoint(e.clientX, e.clientY);
 
   if (selectionStart) {
@@ -182,6 +216,10 @@ function updateConnectingLine(pt) {
 
 function onDocumentMouseUp(e) {
   const pt = clientToSvgPoint(e.clientX, e.clientY);
+
+  // End panning on mouse up
+  isPanning = false;
+  panLastPt = null;
 
   if (selectionStart) {
     finishSelectionBox(pt);
@@ -429,4 +467,101 @@ function startConnecting(e, port) {
   };
 }
 
+
+// ======================================================
+// PAN / ZOOM IMPLEMENTATION
+// ======================================================
+
+function ensureViewBoxInitialized() {
+  if (viewBoxState) return;
+
+  const existing = svg.getAttribute('viewBox');
+  if (existing) {
+    const parts = existing.split(/\s+/).map(Number);
+    if (parts.length === 4 && parts.every(n => !Number.isNaN(n))) {
+      viewBoxState = {
+        x: parts[0],
+        y: parts[1],
+        width: parts[2],
+        height: parts[3]
+      };
+      initialViewBox = { width: parts[2], height: parts[3] };
+      return;
+    }
+  }
+
+  // Default to the current SVG client size if no viewBox is present
+  const w = svg.clientWidth || 800;
+  const h = svg.clientHeight || 600;
+  viewBoxState = { x: 0, y: 0, width: w, height: h };
+  initialViewBox = { width: w, height: h };
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+}
+
+function applyViewBox() {
+  if (!viewBoxState) return;
+  svg.setAttribute(
+    'viewBox',
+    `${viewBoxState.x} ${viewBoxState.y} ${viewBoxState.width} ${viewBoxState.height}`
+  );
+}
+
+function startPanning(e) {
+  ensureViewBoxInitialized();
+  e.preventDefault();
+
+  isPanning = true;
+  panLastPt = { x: e.clientX, y: e.clientY };
+}
+
+function updatePanning(e) {
+  if (!isPanning || !viewBoxState || !panLastPt) return;
+
+  const dxClient = e.clientX - panLastPt.x;
+  const dyClient = e.clientY - panLastPt.y;
+
+  const svgWidth = svg.clientWidth || 1;
+  const svgHeight = svg.clientHeight || 1;
+
+  const scaleX = viewBoxState.width / svgWidth;
+  const scaleY = viewBoxState.height / svgHeight;
+
+  // Move the viewBox opposite to mouse drag to create "grab and move" effect
+  viewBoxState.x -= dxClient * scaleX;
+  viewBoxState.y -= dyClient * scaleY;
+
+  panLastPt = { x: e.clientX, y: e.clientY };
+
+  applyViewBox();
+}
+
+function onSvgWheel(e) {
+  // Zoom in/out with mouse wheel, centered on cursor position
+  ensureViewBoxInitialized();
+  e.preventDefault();
+
+  if (!viewBoxState || !initialViewBox) return;
+
+  const mousePt = clientToSvgPoint(e.clientX, e.clientY);
+
+  // deltaY > 0 → scroll down → zoom out
+  const zoomFactor = e.deltaY > 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+
+  const proposedWidth = viewBoxState.width * zoomFactor;
+
+  const minWidth = initialViewBox.width / MAX_ZOOM;
+  const maxWidth = initialViewBox.width / MIN_ZOOM;
+
+  const newWidth = Math.min(Math.max(proposedWidth, minWidth), maxWidth);
+  const scale = newWidth / viewBoxState.width;
+  const newHeight = viewBoxState.height * scale;
+
+  // Adjust x/y so the zoom is focused on the cursor position
+  viewBoxState.x = mousePt.x - (mousePt.x - viewBoxState.x) * scale;
+  viewBoxState.y = mousePt.y - (mousePt.y - viewBoxState.y) * scale;
+  viewBoxState.width = newWidth;
+  viewBoxState.height = newHeight;
+
+  applyViewBox();
+}
 

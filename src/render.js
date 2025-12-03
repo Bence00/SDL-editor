@@ -76,6 +76,18 @@ function renderNode(node) {
     (state.selectedNodeIds && state.selectedNodeIds.includes(node.id));
   if (selected) g.classList.add("selected");
 
+  // Slightly larger transparent hitbox to make nodes easier to click/drag
+  const HITBOX_PAD = 6;
+  const hitbox = document.createElementNS(SVG_NS, 'rect');
+  hitbox.setAttribute('x', node.x - HITBOX_PAD);
+  hitbox.setAttribute('y', node.y - HITBOX_PAD);
+  hitbox.setAttribute('width', node.width + HITBOX_PAD * 2);
+  hitbox.setAttribute('height', node.height + HITBOX_PAD * 2);
+  hitbox.setAttribute('fill', 'transparent');
+  hitbox.setAttribute('stroke', 'none');
+  hitbox.classList.add('node-hitbox');
+  g.appendChild(hitbox);
+
   // SHAPE
   g.appendChild(createBodyShape(node));
 

@@ -84,7 +84,7 @@ function renderNode(node) {
   hitbox.setAttribute('width', node.width + HITBOX_PAD * 2);
   hitbox.setAttribute('height', node.height + HITBOX_PAD * 2);
   hitbox.setAttribute('fill', 'transparent');
-  hitbox.setAttribute('stroke', 'none');
+  hitbox.setAttribute('stroke', 'transparent');
   hitbox.classList.add('node-hitbox');
   g.appendChild(hitbox);
 

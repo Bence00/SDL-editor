@@ -162,7 +162,7 @@ html, body {
 }
 
 .node.selected path,
-.node.selected rect,
+.node.selected rect:not(.node-hitbox),
 .node.selected ellipse,
 .node.selected polygon {
   stroke: #007bff;

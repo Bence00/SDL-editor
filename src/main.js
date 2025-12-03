@@ -229,5 +229,7 @@ document.getElementById('btnClear')?.addEventListener('click', () => {
   state.resizing = null;
   state.connecting = null;
 
+  diagramNameInput.value = 'default';
+
   render();
 });
